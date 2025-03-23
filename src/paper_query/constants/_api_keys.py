@@ -1,4 +1,4 @@
-from chatbots.utils import load_api_keys
+from paper_query.utils import load_api_keys
 
 # Load the API keys
 api_keys = load_api_keys()

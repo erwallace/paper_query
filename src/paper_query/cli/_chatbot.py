@@ -1,8 +1,8 @@
 import random
 import string
 
-import langgraph
 from langchain_core.messages import HumanMessage
+from langgraph.graph import StateGraph
 
 
 def generate_random_string(length=6):
@@ -10,7 +10,7 @@ def generate_random_string(length=6):
     return "".join(random.choice(letters) for i in range(length))
 
 
-def cli_chatbot(app: langgraph.graph.state.CompiledStateGraph, **kwargs):
+def cli_chatbot(app: StateGraph, **kwargs):
     """CLI Chatbot for LangChain.
 
     Parameters
