@@ -13,6 +13,11 @@ API keys are stored in ~/.config/my_api_keys. Youo will need to create and popul
 TEMPLATE_API_KEY=some_key
 ```
 
+## Commandline Chatbots
+
+### paper-query-v0
+`paper-query-v0 [job=pirate]` is a simple `gpt-4o-mini` chatbot from OpenAI. The chatbot will answer any questions in the style of whichever job is parsed.
+
 ## Preprocessing
 1. Load
     - use grobid (in langchain) to extract from scientific paper
