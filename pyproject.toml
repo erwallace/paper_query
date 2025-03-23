@@ -1,0 +1,37 @@
+[project]
+name = "paper_query"
+description = "A RAG LLM chat-bot that allows you to ask questions about the StrainRelief publication and code repository."
+authors = [{name = "Ewan Wallace"}]
+dynamic = ["version", "readme", "dependencies", "optional-dependencies"]
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.in"]}
+readme = {file = "README.md"}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ["requirements-dev.in"]}
+
+[build-system]
+requires = ["setuptools >= 65", "setuptools_scm[toml]>=6.2"]
+build-backend = 'setuptools.build_meta'
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle
+    "F", # pyflakes
+    "I", # isort
+    "UP", # pyupgrade
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.setuptools_scm]
+local_scheme = "node-and-date"
+search_parent_directories = true
+version_scheme = "no-guess-dev"
+fallback_version = "0.0.1"
