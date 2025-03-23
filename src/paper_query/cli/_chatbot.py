@@ -15,7 +15,7 @@ def cli_chatbot(app: StateGraph, **kwargs):
 
     Parameters
     ----------
-    app: langgraph.graph.state.CompiledStateGraph
+    app: (Compiled)StateGraph
         The compiled state graph. Example usage:
 
         ********************************************
