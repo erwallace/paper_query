@@ -17,12 +17,19 @@ from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
 from paper_query.cli import cli_chatbot
-from paper_query.constants import OPENAI_API_KEY
 
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+MODEL_PROVIDER = "openai"
+MODEL_NAME = "gpt-4o-mini"
+
+if MODEL_PROVIDER == "openai":
+    from paper_query.constants import OPENAI_API_KEY
+
+    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+else:
+    raise ValueError(f"API key not provided for {MODEL_PROVIDER}")
 
 # Define the chat model
-model = init_chat_model("gpt-4o-mini", model_provider="openai")
+model = init_chat_model(MODEL_NAME, model_provider=MODEL_PROVIDER)
 
 
 # Define the state schema
@@ -77,6 +84,10 @@ def main():
     parser.add_argument("--job", type=str, default="pirate", help="The job role to simulate")
     args = parser.parse_args()
 
+    print()
+    print(r"paper-query-v0: LangChain CLI Chatbot. Talk like a {job}.")
+    print(f"Using the {MODEL_NAME} model from {MODEL_PROVIDER}.")
+    print()
     cli_chatbot(app, job=args.job)
 
 
