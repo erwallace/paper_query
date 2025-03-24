@@ -16,7 +16,7 @@ def cli_chatbot(chatbot: BaseChatbot):
             break
 
         print("\nAI: ", end="", flush=True)
-        for chunk in chatbot.process_input(user_input):
+        for chunk in chatbot.stream_response(user_input):
             print(chunk, end="", flush=True)
             import time
 

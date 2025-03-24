@@ -15,27 +15,23 @@ class BaseChatbot:
         self.model_name: str = model_name
         self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
 
-        # Setup memory
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-
-    def process_input(self, user_input: str, chain_kwargs: dict = {}) -> str:
+    def stream_response(self, user_input: str, chain_args: dict = {}) -> str:
         """Process user input and stream AI response."""
         # Add user message to history before streaming
         self.chat_history.append(HumanMessage(content=user_input))
 
-        # Stream the response
-        response_chunks = []
+        response = "".join(
+            [
+                chunk
+                for chunk in self.chain.stream(
+                    {"input": user_input, "chat_history": self.chat_history, **chain_args}
+                )
+            ]
+        )
 
-        for chunk in self.chain.stream(
-            {"input": user_input, "chat_history": self.chat_history, **chain_kwargs}
-        ):
-            response_chunks.append(chunk)
-            yield chunk
-
-        # After streaming is complete, collect the full response and add to history
-        response = "".join(response_chunks)
         self.chat_history.extend([HumanMessage(content=user_input), response])
         return response
 
@@ -53,8 +49,8 @@ class PaperQueryChatbot(BaseChatbot):
         )
         self.paper_text = pypdf_loader(paper_path)
 
-    def process_input(self, user_input: str) -> str:
-        return super().process_input(user_input, chain_kwargs={"paper_text": self.paper_text})
+    def stream_response(self, user_input: str) -> str:
+        return super().process_input(user_input, {"paper_text": self.paper_text})
 
 
 class PaperQueryPlusChatbot(BaseChatbot):
@@ -78,9 +74,9 @@ class PaperQueryPlusChatbot(BaseChatbot):
         for file in os.listdir(refernces_dir):
             self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
 
-    def process_input(self, user_input: str) -> str:
+    def stream_response(self, user_input: str) -> str:
         return super().process_input(
-            user_input, chain_kwargs={"paper_text": self.paper_text, "references": self.references}
+            user_input, {"paper_text": self.paper_text, "references": self.references}
         )
 
 
