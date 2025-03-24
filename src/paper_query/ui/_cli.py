@@ -12,7 +12,7 @@ def cli_chatbot(chatbot: BaseChatbot):
         user_input = input("\nYou: ")
 
         if user_input.lower() in ["exit", "quit", "q"]:
-            print("Goodbye!")
+            print("\nGoodbye!\n")
             break
 
         print("\nAI: ", end="", flush=True)
