@@ -16,7 +16,10 @@ TEMPLATE_API_KEY=some_key
 ## Commandline Chatbots
 
 ### paper-query-v0
-`paper-query-v0 [job=pirate]` is a simple `gpt-4o-mini` chatbot from OpenAI. The chatbot will answer any questions in the style of whichever job is parsed.
+`paper-query-v0 [model] [provider]` is a CLI for a common or garden chatbot.
+
+### paper-query-v1
+`paper-query-v1 [model] [provider] [paper]` is a CLI for a chatbot querying a single paper. The entire paper is held in context.
 
 ## Preprocessing
 1. Load
@@ -67,6 +70,8 @@ TEMPLATE_API_KEY=some_key
     - add pypdf function to load paper. what does output does this give for an academic paper?
     - download arXiv paper for this use-case
     - how do I know what the max context length is? and how do I know how much I'm using? Add custom error handling here - remove references from paper?
+    - option to load images as well
+    - add llama 3.1 8B instruct as model option so that they're not using my tokens
     - write a selection of questions to QA any future changes
     - commit any changes
     - DONE.
@@ -76,6 +81,7 @@ TEMPLATE_API_KEY=some_key
     - add second page describing what model, embedding etc are used for each method.
     - deploy to cloud.
 3. move to an embedding model: upload all references from strainrelief and use open AI embeddings to see if this works nicely. Can I keep all of strairelief in the context? and then just add little bits of other papers?
+    - cache embeddings? or load fro vectorstore is they're there. then I can use pypdf_loader_w_images for all.
     - start by implementing this in a notebook with the cli, streamlit can come later.
     - look at how paperQA2 parse their papers (GROBID?). Try this instead of pypdf on just strainrelief. Does it still answer all questions sucessfully?
     - look to see if there are any papers ot support this hypthesis: does adding reference papers help queries about the orginal paper?

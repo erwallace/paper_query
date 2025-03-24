@@ -38,3 +38,4 @@ fallback_version = "0.0.1"
 
 [project.scripts]
 paper-query-v0 = "paper_query.chatbots:paper_query_v0"
+paper-query-v1 = "paper_query.chatbots:paper_query_v1"
