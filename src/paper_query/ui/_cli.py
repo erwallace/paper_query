@@ -1,13 +1,7 @@
-import random
-import string
-
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph
 
-
-def generate_random_string(length=6):
-    letters = string.ascii_letters + string.digits
-    return "".join(random.choice(letters) for i in range(length))
+from paper_query.utils import random_string
 
 
 def cli_chatbot(app: StateGraph, **kwargs):
@@ -41,7 +35,7 @@ def cli_chatbot(app: StateGraph, **kwargs):
         print("Bot: ", end="", flush=True)
         for chunk, metadata in app.stream(
             {"messages": input_messages, **kwargs},
-            {"configurable": {"thread_id": generate_random_string()}},
+            {"configurable": {"thread_id": random_string()}},
             stream_mode="messages",
         ):
             print(chunk.content, end="", flush=True)
