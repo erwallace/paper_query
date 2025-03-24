@@ -1,0 +1,49 @@
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+base_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are a helpful assistant. Answer the following questions to the best of your
+            ability.""",
+        ),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+    ]
+)
+
+paper_query_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "Below is the full text of a research paper. "
+            "Reference this content when answering questions:\n\n{paper_text}",
+        ),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+    ]
+)
+
+paper_query_plus_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "[placeholder]"),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+    ]
+)
+
+code_query_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "[placeholder]"),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+    ]
+)
+
+hybrid_query_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "[placeholder]"),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{input}"),
+    ]
+)
