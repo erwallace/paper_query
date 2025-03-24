@@ -5,6 +5,7 @@ from langchain_core.messages import BaseMessage, HumanMessage
 
 from paper_query.data import pypdf_loader
 from paper_query.llm import get_chain
+from paper_query.llm.prompts import base_prompt, paper_query_plus_prompt, paper_query_prompt
 
 
 class BaseChatbot:
@@ -14,7 +15,7 @@ class BaseChatbot:
         self.model_name: str = model_name
         self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
-        self.chain = get_chain(model_name, model_provider)
+        self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
 
         # Setup memory
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -44,6 +45,12 @@ class PaperQueryChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str):
         super().__init__(model_name, model_provider)
+        self.chain = get_chain(
+            model_name,
+            model_provider,
+            prompt=paper_query_prompt,
+            additional_keys={"paper_text": lambda x: x["paper_text"]},
+        )
         self.paper_text = pypdf_loader(paper_path)
 
     def process_input(self, user_input: str) -> str:
@@ -56,6 +63,15 @@ class PaperQueryPlusChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str, refernces_dir: str):
         super().__init__(model_name, model_provider)
+        self.chain = get_chain(
+            model_name,
+            model_provider,
+            prompt=paper_query_plus_prompt,
+            additional_keys={
+                "paper_text": lambda x: x["paper_text"],
+                "references": lambda x: x["references"],
+            },
+        )
         self.paper_text = pypdf_loader(paper_path)
 
         self.references = []
