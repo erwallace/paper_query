@@ -16,7 +16,7 @@ from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
-from paper_query.cli import cli_chatbot
+from paper_query.ui import cli_chatbot
 
 MODEL_PROVIDER = "openai"
 MODEL_NAME = "gpt-4o-mini"
