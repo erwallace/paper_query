@@ -50,7 +50,7 @@ class PaperQueryChatbot(BaseChatbot):
         self.paper_text = pypdf_loader(paper_path)
 
     def stream_response(self, user_input: str) -> str:
-        return super().process_input(user_input, {"paper_text": self.paper_text})
+        return super().stream_response(user_input, {"paper_text": self.paper_text})
 
 
 class PaperQueryPlusChatbot(BaseChatbot):
@@ -75,7 +75,7 @@ class PaperQueryPlusChatbot(BaseChatbot):
             self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
 
     def stream_response(self, user_input: str) -> str:
-        return super().process_input(
+        return super().stream_response(
             user_input, {"paper_text": self.paper_text, "references": self.references}
         )
 
