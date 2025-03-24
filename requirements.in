@@ -1,6 +1,5 @@
 streamlit
-ipykernel
-langgraph
 langchain
 langchain-openai
 langchain_community
+pypdf
