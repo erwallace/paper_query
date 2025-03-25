@@ -1,7 +1,8 @@
 import streamlit as st
 
 
-def display_chat_interface():
+def display_chat_interface() -> None:
+    """Display the chat interface."""
     if "messages" not in st.session_state:
         st.session_state.messages = []
 

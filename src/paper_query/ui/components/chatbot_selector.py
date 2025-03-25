@@ -9,7 +9,8 @@ from paper_query.chatbots import (
 )
 
 
-def select_chatbot():
+def select_chatbot() -> tuple[type, str]:
+    """Select the chatbot class."""
     chatbot_options = {
         "Base": BaseChatbot,
         "PaperQuery": PaperQueryChatbot,

@@ -12,7 +12,7 @@ from paper_query.llm.prompts import base_prompt, paper_query_plus_prompt, paper_
 class BaseChatbot:
     """Base class for chatbots."""
 
-    def __init__(self, model_name, model_provider):
+    def __init__(self, model_name: str, model_provider: str):
         self.model_name: str = model_name
         self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
@@ -47,8 +47,9 @@ class PaperQueryChatbot(BaseChatbot):
             additional_keys={"paper_text": lambda x: x["paper_text"]},
         )
         self.paper_text = pypdf_loader(paper_path)
+        print(type(self.paper_text))
 
-    def stream_response(self, user_input: str) -> str:
+    def stream_response(self, user_input: str) -> Generator[str, None, None]:
         return super().stream_response(user_input, {"paper_text": self.paper_text})
 
 
@@ -73,7 +74,7 @@ class PaperQueryPlusChatbot(BaseChatbot):
         for file in os.listdir(refernces_dir):
             self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
 
-    def stream_response(self, user_input: str) -> str:
+    def stream_response(self, user_input: str) -> Generator[str, None, None]:
         return super().stream_response(
             user_input, {"paper_text": self.paper_text, "references": self.references}
         )
@@ -94,7 +95,7 @@ class CodeQueryChatbot(BaseChatbot):
         )
         self.code_dir = ""
 
-    def stream_response(self, user_input: str) -> str:
+    def stream_response(self, user_input: str) -> Generator[str, None, None]:
         return super().stream_response(user_input, {"code_dir": self.code_dir})
 
 
@@ -128,7 +129,7 @@ class HybridQueryChatbot(BaseChatbot):
 
         self.code_dir = ""
 
-    def stream_response(self, user_input: str) -> str:
+    def stream_response(self, user_input: str) -> Generator[str, None, None]:
         return super().stream_response(
             user_input,
             {
