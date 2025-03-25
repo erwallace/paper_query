@@ -6,7 +6,6 @@ A chatbot for querying a single paper. The entire paper is held in context.
 
 import argparse
 
-from paper_query import assets_dir
 from paper_query.chatbots import PaperQueryChatbot
 from paper_query.ui import cli_chatbot
 
@@ -28,14 +27,13 @@ def main():
     parser.add_argument(
         "--paper",
         type=str,
-        default=str(assets_dir / "strainrelief_preprint.pdf"),
+        default="./assets/strainrelief_preprint.pdf",
         help="Path to the paper for the chatbot",
     )
     args = parser.parse_args()
 
     # Initialize chatbot with paper and run chatbot
     chatbot = PaperQueryChatbot(args.model, args.provider, args.paper)
-    # chatbot = BaseChatbot(MODEL_NAME, MODEL_PROVIDER)
     cli_chatbot(chatbot)
 
 

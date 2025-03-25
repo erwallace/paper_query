@@ -83,10 +83,58 @@ class PaperQueryPlusChatbot(BaseChatbot):
 class CodeQueryChatbot(BaseChatbot):
     """RAG chatbot for querying a code repository. Code is stored in embeddings."""
 
-    pass
+    def __init__(self, model_name: str, model_provider: str, code_dir: str):
+        super().__init__(model_name, model_provider)
+        self.chain = get_chain(
+            model_name,
+            model_provider,
+            prompt=paper_query_plus_prompt,
+            additional_keys={
+                "code_dir": lambda x: x["code_dir"],
+            },
+        )
+        self.code_dir = ""
+
+    def stream_response(self, user_input: str) -> str:
+        return super().stream_response(user_input, {"code_dir": self.code_dir})
 
 
 class HybridQueryChatbot(BaseChatbot):
     """RAG chatbot for querying a paper, it's code repository and all of it's references."""
 
-    pass
+    def __init__(
+        self,
+        model_name: str,
+        model_provider: str,
+        paper_path: str,
+        refernces_dir: str,
+        code_dir: str,
+    ):
+        super().__init__(model_name, model_provider)
+        self.chain = get_chain(
+            model_name,
+            model_provider,
+            prompt=paper_query_plus_prompt,
+            additional_keys={
+                "paper_text": lambda x: x["paper_text"],
+                "references": lambda x: x["references"],
+                "code_dir": lambda x: x["code_dir"],
+            },
+        )
+        self.paper_text = pypdf_loader(paper_path)
+
+        self.references = []
+        for file in os.listdir(refernces_dir):
+            self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
+
+        self.code_dir = ""
+
+    def stream_response(self, user_input: str) -> str:
+        return super().stream_response(
+            user_input,
+            {
+                "paper_text": self.paper_text,
+                "references": self.references,
+                "code_dir": self.code_dir,
+            },
+        )
