@@ -14,10 +14,16 @@ def display_chat_interface():
             st.chat_message("user").markdown(user_input)
             st.session_state.messages.append({"role": "user", "content": user_input})
 
-            response = st.session_state.chatbot.stream_response(user_input)
-
             with st.chat_message("assistant"):
-                st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+                message_placeholder = st.empty()
+                full_response = ""
+
+                for response_chunk in st.session_state.chatbot.stream_response(user_input):
+                    full_response += response_chunk
+                    message_placeholder.markdown(full_response)
+
+                message_placeholder.markdown(full_response)
+
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
         st.info("Please select a chatbot type and confirm in the sidebar to start chatting.")

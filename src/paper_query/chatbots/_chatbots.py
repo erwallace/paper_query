@@ -1,7 +1,8 @@
 import os
+from collections.abc import Generator
 
 from langchain.memory import ConversationBufferMemory
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from paper_query.data import pypdf_loader
 from paper_query.llm import get_chain
@@ -18,22 +19,20 @@ class BaseChatbot:
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
 
-    def stream_response(self, user_input: str, chain_args: dict = {}) -> str:
+    def stream_response(self, user_input: str, chain_args: dict = {}) -> Generator[str, None, None]:
         """Process user input and stream AI response."""
         # Add user message to history before streaming
         self.chat_history.append(HumanMessage(content=user_input))
 
-        response = "".join(
-            [
-                chunk
-                for chunk in self.chain.stream(
-                    {"input": user_input, "chat_history": self.chat_history, **chain_args}
-                )
-            ]
-        )
+        full_response = ""
+        for chunk in self.chain.stream(
+            {"input": user_input, "chat_history": self.chat_history, **chain_args}
+        ):
+            full_response += chunk
+            yield chunk
 
-        self.chat_history.extend([HumanMessage(content=user_input), response])
-        return response
+        # After streaming is complete, add the full response to chat history
+        self.chat_history.append(AIMessage(content=full_response))
 
 
 class PaperQueryChatbot(BaseChatbot):
