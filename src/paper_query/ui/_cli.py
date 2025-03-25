@@ -1,4 +1,4 @@
-from paper_query.chatbots.base import BaseChatbot
+from paper_query.chatbots import BaseChatbot
 
 
 def cli_chatbot(chatbot: BaseChatbot):

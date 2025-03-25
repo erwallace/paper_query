@@ -6,7 +6,7 @@ A common or garden CLI chatbot.
 
 import argparse
 
-from paper_query.chatbots.base import BaseChatbot
+from paper_query.chatbots import BaseChatbot
 from paper_query.ui import cli_chatbot
 
 
