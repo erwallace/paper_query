@@ -1,13 +1,12 @@
 """
-paper-query-v1 [model] [provider] [paper]
+paper-query-v1 [model] [provider]
 
-A chatbot for querying a single paper. The entire paper is held in context.
+A common or garden CLI chatbot.
 """
 
 import argparse
 
-from paper_query import assets_dir
-from paper_query.chatbots.base import PaperQueryChatbot
+from paper_query.chatbots import BaseChatbot
 from paper_query.ui import cli_chatbot
 
 
@@ -25,17 +24,10 @@ def main():
         default="openai",
         help="Model provider to use for the chatbot",
     )
-    parser.add_argument(
-        "--paper",
-        type=str,
-        default=str(assets_dir / "strainrelief_preprint.pdf"),
-        help="Path to the paper for the chatbot",
-    )
     args = parser.parse_args()
 
     # Initialize chatbot with paper and run chatbot
-    chatbot = PaperQueryChatbot(args.model, args.provider, args.paper)
-    # chatbot = BaseChatbot(MODEL_NAME, MODEL_PROVIDER)
+    chatbot = BaseChatbot(args.model, args.provider)
     cli_chatbot(chatbot)
 
 
