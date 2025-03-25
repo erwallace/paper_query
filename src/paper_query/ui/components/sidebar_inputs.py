@@ -1,5 +1,4 @@
 import inspect
-import os
 import tempfile
 
 import streamlit as st
@@ -21,13 +20,9 @@ def model_provider_input(provider="openai"):
 def paper_path_input():
     uploaded_file = st.sidebar.file_uploader("Upload PDF", type="pdf")
     if uploaded_file is not None:
-        # TODO: fix temp dir savinf. Errors when loading in PyPDFLoader().
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_file_path = os.path.join(temp_dir, uploaded_file.name)
-            with open(temp_file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            st.sidebar.success(f"PDF uploaded: {uploaded_file.name}")
-            return temp_file_path
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(uploaded_file.getvalue())
+            return tmp_file.name
     return "./assets/strainrelief_preprint.pdf"
 
 
