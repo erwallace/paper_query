@@ -9,7 +9,7 @@ import streamlit as st
 def get_class_params(cls) -> list[str]:
     """Get the parameters of a class."""
     params = inspect.signature(cls.__init__).parameters
-    return [name for name, param in params.items() if name != "self"]
+    return [name for name in params.keys() if name != "self"]
 
 
 def model_name_input(name: str = "gpt-4o") -> str:
@@ -57,7 +57,7 @@ def get_param(param: str) -> str | list[str]:
         "model_name": model_name_input,
         "model_provider": model_provider_input,
         "paper_path": paper_path_input,
-        "refernces_dir": references_input,
+        "references_dir": references_input,
         "code_dir": code_dir_input,
     }
     if param in param_functions:
