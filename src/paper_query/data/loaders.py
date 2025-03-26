@@ -40,9 +40,9 @@ def references_loader(refs_dir: str) -> list[Document]:
     return references
 
 
-def code_loader(github_repo_url: str) -> list[Document]:
+def code_loader(github_repo_url: str, repo_path: str = str(assets_dir / "code")) -> list[Document]:
     """Function to load code from a git repository."""
     return GitLoader(
-        repo_path=assets_dir / "code",
+        repo_path=repo_path,
         clone_url=github_repo_url,
     ).load()
