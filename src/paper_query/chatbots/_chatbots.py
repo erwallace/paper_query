@@ -218,7 +218,6 @@ class HybridQueryChatbot(BaseChatbot):
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
                 "relevant_references": lambda x: x["relevant_references"],
-                "relevant_code": lambda x: x["relevant_code"],
             },
         )
 
