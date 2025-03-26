@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from ._paper_query_v0 import main as paper_query_v0
-from ._paper_query_v1 import main as paper_query_v1
+from .base_chatbot import main as base_chatbot
+from .paper_query_chatbot import main as paper_query_chatbot
+from .paper_query_plus_chatbot import main as paper_query_plus_chatbot
 
 # Directories
 project_dir: Path = Path(__file__).resolve().parents[2]
@@ -11,8 +12,9 @@ data_dir: Path = project_dir / "data"
 assets_dir: Path = project_dir / "assets"
 
 __all__ = [
-    "paper_query_v0",
-    "paper_query_v1",
+    "base_chatbot",
+    "paper_query_chatbot",
+    "paper_query_plus_chatbot",
     "project_dir",
     "src_dir",
     "test_dir",
