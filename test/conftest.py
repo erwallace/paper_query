@@ -1,0 +1,12 @@
+import os
+from pathlib import Path
+
+import pytest
+from paper_query.constants import OPENAI_API_KEY
+
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+
+
+@pytest.fixture(scope="session")
+def assets_dir():
+    return Path(__file__).resolve().parents[0] / "assets"
