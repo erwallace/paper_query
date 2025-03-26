@@ -1,9 +1,10 @@
 import inspect
 import tempfile
+from pathlib import Path
 
 import streamlit as st
 
-# from paper_query import assets_dir
+assets_dir = Path(__file__).resolve().parents[4] / "assets"
 
 
 def get_class_params(cls) -> list[str]:
@@ -34,8 +35,7 @@ def paper_path_input() -> str:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             tmp_file.write(uploaded_file.getvalue())
             return tmp_file.name
-    return "./assets/strainrelief_preprint.pdf"
-    # return str(assets_dir / "strainrelief_preprint.pdf")
+    return str(assets_dir / "strainrelief_preprint.pdf")
 
 
 def references_input() -> str:
@@ -50,9 +50,7 @@ def references_input() -> str:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir=temp_dir) as tmp_file:
                 tmp_file.write(uploaded_file.getvalue())
         return temp_dir
-
-    return "./assets/references"
-    # return str(assets_dir / "references")
+    return str(assets_dir / "references")
 
 
 def code_dir_input() -> str:
