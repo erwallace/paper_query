@@ -36,6 +36,12 @@ search_parent_directories = true
 version_scheme = "no-guess-dev"
 fallback_version = "0.0.1"
 
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')"
+]
+
 [project.scripts]
 chatbot = "paper_query:base_chatbot"
 paper-query = "paper_query:paper_query_chatbot"
