@@ -7,6 +7,8 @@ from langchain_community.document_loaders.parsers.images import LLMImageBlobPars
 from langchain_core.documents.base import Document
 from langchain_openai import ChatOpenAI
 
+from paper_query.constants import RAG_DOC_ID
+
 assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
 
@@ -35,14 +37,17 @@ def references_loader(refs_dir: str) -> list[Document]:
     references = []
     for file in os.listdir(refs_dir):
         document = pypdf_loader(os.path.join(refs_dir, file))
-        document.metadata["filename"] = file
+        document.metadata[RAG_DOC_ID] = file
         references.append(document)
     return references
 
 
 def code_loader(github_repo_url: str) -> list[Document]:
     """Function to load code from a git repository."""
-    return GitLoader(
+    code = GitLoader(
         repo_path=assets_dir / "code",
         clone_url=github_repo_url,
     ).load()
+    for file in code:
+        file.metadata[RAG_DOC_ID] = file.metadata["file_path"]
+    return code
