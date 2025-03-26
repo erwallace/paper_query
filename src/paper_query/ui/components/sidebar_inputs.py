@@ -1,9 +1,10 @@
 import inspect
 import tempfile
+from pathlib import Path
 
 import streamlit as st
 
-# from paper_query import assets_dir
+assets_dir = Path(__file__).resolve().parents[4] / "assets"
 
 
 def get_class_params(cls) -> list[str]:
@@ -12,7 +13,8 @@ def get_class_params(cls) -> list[str]:
     return [
         name
         for name in params.keys()
-        if name in ("model_name", "model_provider", "paper_path", "references_dir", "code_dir")
+        if name
+        in ("model_name", "model_provider", "paper_path", "references_dir", "github_repo_url")
     ]
 
 
@@ -34,8 +36,7 @@ def paper_path_input() -> str:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             tmp_file.write(uploaded_file.getvalue())
             return tmp_file.name
-    return "./assets/strainrelief_preprint.pdf"
-    # return str(assets_dir / "strainrelief_preprint.pdf")
+    return str(assets_dir / "strainrelief_preprint.pdf")
 
 
 def references_input() -> str:
@@ -50,18 +51,12 @@ def references_input() -> str:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir=temp_dir) as tmp_file:
                 tmp_file.write(uploaded_file.getvalue())
         return temp_dir
-
-    return "./assets/references"
-    # return str(assets_dir / "references")
+    return str(assets_dir / "references")
 
 
-def code_dir_input() -> str:
+def code_dir_input(github_repo_url="https://github.com/prescient-design/StrainRelief.git") -> str:
     """Get the code directory from the sidebar."""
-    uploaded_file = st.sidebar.file_uploader("Upload Code", type="zip")
-    if uploaded_file is not None:
-        # TODO: Implement code directory handling
-        pass
-    return ""
+    return st.sidebar.text_input("GitHub Repository URL", value=github_repo_url)
 
 
 def get_param(param: str) -> str | list[str]:
@@ -71,7 +66,7 @@ def get_param(param: str) -> str | list[str]:
         "model_provider": model_provider_input,
         "paper_path": paper_path_input,
         "references_dir": references_input,
-        "code_dir": code_dir_input,
+        "github_repo_url": code_dir_input,
     }
     if param in param_functions:
         return param_functions[param]()

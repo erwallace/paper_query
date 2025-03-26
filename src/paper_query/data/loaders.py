@@ -1,9 +1,13 @@
 import os
+from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders.git import GitLoader
 from langchain_community.document_loaders.parsers.images import LLMImageBlobParser
 from langchain_core.documents.base import Document
 from langchain_openai import ChatOpenAI
+
+assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
 
 def pypdf_loader(file_path: str) -> Document:
@@ -34,3 +38,11 @@ def references_loader(refs_dir: str) -> list[Document]:
         document.metadata["filename"] = file
         references.append(document)
     return references
+
+
+def code_loader(github_repo_url: str) -> list[Document]:
+    """Function to load code from a git repository."""
+    return GitLoader(
+        repo_path=assets_dir / "code",
+        clone_url=github_repo_url,
+    ).load()
