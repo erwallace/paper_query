@@ -26,7 +26,20 @@ paper_query_prompt = ChatPromptTemplate.from_messages(
 
 paper_query_plus_prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", "[placeholder]"),
+        (
+            "system",
+            """You are an AI assistant specialized in analyzing scientific papers and their
+            references. Use the provided paper text and relevant information from references
+            to answer questions. Always cite your sources at the end of your response using
+            the format [source_name].
+
+        Main paper text:
+        {paper_text}
+
+        Relevant information from references:
+        {relevant_references}
+        """,
+        ),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
     ]
