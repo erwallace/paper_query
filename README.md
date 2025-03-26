@@ -48,44 +48,49 @@ TEMPLATE_API_KEY=some_key
 
 ![image](assets/rag_qna.png)
 
-# To Do List
-- Proof of Concept:
-    - loading from paper pdf using grobid
-    - very simple but functioning CLI to check everything else is working
-    - THEN add in the code repo
-    - come up with some standard qustions of varying difficulities to test the model with
-- use Claude to help me build a simple UI / CLI
-- create `paper-query` CLI with hydra that initiates a terminal chat bot
-
 # Workflow
-1. paper_query: simple cli that answers questions about the strainrelief paper - adds the whole paper as context.
-    - read through LangChain's chatbot tutorial and try to understand each step. What are the other kwargs for each function used? What other functions could be used for each? Do this in a jupyter notebook. Do this is `./tutorials/langchain_chatbot.ipynb`.
-    - load openai's api key
-    - load openai's model
-    - create "chain"
-    - write simple chatbot cli function. it should print the model used.
-    - test out in a jupyter notbook and then a script.
-    - [once it is working commit changes]
-    - add a prompt for analysing a paper
-    - add pypdf function to load paper. what does output does this give for an academic paper?
-    - download arXiv paper for this use-case
-    - how do I know what the max context length is? and how do I know how much I'm using? Add custom error handling here - remove references from paper?
-    - option to load images as well
-    - add llama 3.1 8B instruct as model option so that they're not using my tokens
-    - write a selection of questions to QA any future changes
-    - commit any changes
-    - DONE.
-2. streamlit interface for paper_query and deploy to streamlit cloud community
-    - simple streamlit app, single page, no custom pdf loading
-    - add model selection. I want to be able to use OpenAI but I don't want other people using up my credits.
-    - add second page describing what model, embedding etc are used for each method.
-    - deploy to cloud.
-3. move to an embedding model: upload all references from strainrelief and use open AI embeddings to see if this works nicely. Can I keep all of strairelief in the context? and then just add little bits of other papers?
-    - cache embeddings? or load fro vectorstore is they're there. then I can use pypdf_loader_w_images for all.
-    - start by implementing this in a notebook with the cli, streamlit can come later.
-    - look at how paperQA2 parse their papers (GROBID?). Try this instead of pypdf on just strainrelief. Does it still answer all questions sucessfully?
-    - look to see if there are any papers ot support this hypthesis: does adding reference papers help queries about the orginal paper?
-    - implement a simple embedding method e.g. huggingface or openai's embeddings.
-    - look at how paperqa2 do their embeddings
-4. code_query: RAG system to query the code repository.
-5. hydrid_query: queries both the the code and the papers(s) in a single model.
+1. paper_query_v0: a simple chatbot built in a modular and expandable fashion.
+
+- LangChain chatbot tutorials
+- LangChain RAG tutorials
+- simple cli chatbot functionality
+
+2. paper_query_v2: load the StrainRelief paper and use in context
+
+- Expand BaseChatbot class for new functionality.
+- PyPDFLoader for paper loading (option to load images)
+- model selection and stroage of api keys
+- add llama 3.1 8B instruct model
+
+3. streamlit interface
+
+- chat function wiht streaming
+- sidebar for selection of chatbot class and all required parameters
+
+4. paper_query_v2: RAG system for references
+
+5. paper_query_v3: RAG system to query the code repository.
+
+6. paper_query_v4: queries both the the code and the papers(s) in a single model.
+
+7.  QA: Qualtiy assurance questions. Can be used to make iterative improvements.
+
+8. Deployment: add a local deployment using Docker and AWS.
+
+9. paper_query_lite: fork paper_query and create MVP for the hybrid model. No uploading your own files. Then share this.
+
+### Additional:
+- QA: Write a selection of questions to QA any iterative improvements of the final model.
+- Chat History: Can I be smart adding StrainRelief to the context and history? StrainRelief ~10,500 tokens out of 128,000. After several questions you will lose the initial history because StrainReleif is included in every question.
+- Vectorstore: check if pdfs are saved previosuly and if so then don't load them.
+- Retrieval: LLM extraction and compression for RAG. Ablation test this.
+    ```
+    compressor = LLMChainExtractor.from_llm(llm)
+    self.retriever = ContextualCompressionRetrieve(base_compressor=compressor, base_retriever=base_retriever)
+    ```
+- Loaders: look at how PaperQA2 parse their papers (GROBID?). Can I emulate that? does it have a noticable difference?
+- Loaders: find a smart way of loading the title and author of each paper for referencing.
+- Embeddings: lokk at how PaperQA2 do thier embeddings. Can I emulate that? does it have a noticable difference?
+- Streamlit: add tab explaining the process used for each chatbot.
+- Streamlit: make upload file more intiative with labels/comments.
+- Streamlit: deploy to streamlit cloud. Need a way to prevent people using my openai tokens before doing this.

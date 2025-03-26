@@ -4,9 +4,12 @@ from collections.abc import Generator
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
-from paper_query.data import pypdf_loader
+from paper_query.data.loaders import pypdf_loader, references_loader
+from paper_query.data.processors import split_documents
 from paper_query.llm import get_chain
 from paper_query.llm.prompts import base_prompt, paper_query_plus_prompt, paper_query_prompt
+from paper_query.rag.retrieval import setup_retriever
+from paper_query.rag.vectorstore import create_vectorstore
 
 
 class BaseChatbot:
@@ -47,7 +50,6 @@ class PaperQueryChatbot(BaseChatbot):
             additional_keys={"paper_text": lambda x: x["paper_text"]},
         )
         self.paper_text = pypdf_loader(paper_path)
-        print(type(self.paper_text))
 
     def stream_response(self, user_input: str) -> Generator[str, None, None]:
         return super().stream_response(user_input, {"paper_text": self.paper_text})
@@ -57,26 +59,56 @@ class PaperQueryPlusChatbot(BaseChatbot):
     """RAG chatbot for querying a paper and all of its references. The paper is held in context,
     references are stored in embeddings."""
 
-    def __init__(self, model_name: str, model_provider: str, paper_path: str, refernces_dir: str):
+    def __init__(
+        self,
+        model_name: str,
+        model_provider: str,
+        paper_path: str,
+        references_dir: str,
+        split_method: str = "recursive",
+        embedding_method: str = "openai",
+        retriever_method: str = "base",
+        **kwargs,
+    ):
         super().__init__(model_name, model_provider)
+
+        # Load the main paper
+        self.paper_text = pypdf_loader(paper_path)
+
+        # Process references for embeddings
+        self.references = references_loader(references_dir)
+        split_docs = split_documents(
+            self.references, method=split_method, **kwargs.get("split_kwargs", {})
+        )
+
+        # Create vectorstore and retriever
+        self.vectorstore = create_vectorstore(
+            split_docs, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+        )
+        self.retriever = setup_retriever(
+            self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
+        )
+
+        # Update the chain
         self.chain = get_chain(
             model_name,
             model_provider,
             prompt=paper_query_plus_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
-                "references": lambda x: x["references"],
+                "relevant_references": lambda x: x["relevant_references"],
             },
         )
-        self.paper_text = pypdf_loader(paper_path)
-
-        self.references = []
-        for file in os.listdir(refernces_dir):
-            self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
 
     def stream_response(self, user_input: str) -> Generator[str, None, None]:
+        # Retrieve relevant reference information
+        relevant_docs = self.retriever.invoke(user_input)
+        relevant_references = "\n".join(
+            [f"From {doc.metadata['filename']}:\n{doc.page_content}" for doc in relevant_docs]
+        )
+
         return super().stream_response(
-            user_input, {"paper_text": self.paper_text, "references": self.references}
+            user_input, {"paper_text": self.paper_text, "relevant_references": relevant_references}
         )
 
 
@@ -107,7 +139,7 @@ class HybridQueryChatbot(BaseChatbot):
         model_name: str,
         model_provider: str,
         paper_path: str,
-        refernces_dir: str,
+        references_dir: str,
         code_dir: str,
     ):
         super().__init__(model_name, model_provider)
@@ -124,8 +156,8 @@ class HybridQueryChatbot(BaseChatbot):
         self.paper_text = pypdf_loader(paper_path)
 
         self.references = []
-        for file in os.listdir(refernces_dir):
-            self.references.append(pypdf_loader(os.path.join(refernces_dir, file)))
+        for file in os.listdir(references_dir):
+            self.references.append(pypdf_loader(os.path.join(references_dir, file)))
 
         self.code_dir = ""
 
