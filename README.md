@@ -92,5 +92,5 @@ TEMPLATE_API_KEY=some_key
 - Loaders: find a smart way of loading the title and author of each paper for referencing.
 - Embeddings: lokk at how PaperQA2 do thier embeddings. Can I emulate that? does it have a noticable difference?
 - Streamlit: add tab explaining the process used for each chatbot.
-- Streamlit: make upload file more intiative with labels/comments.
+- Streamlit: make upload file more intiative with labels/comments.- Streamlit: infer model provider from model and make model selection a dropdown (with free text option?).
 - Streamlit: deploy to streamlit cloud. Need a way to prevent people using my openai tokens before doing this.
