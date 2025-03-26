@@ -9,7 +9,11 @@ import streamlit as st
 def get_class_params(cls) -> list[str]:
     """Get the parameters of a class."""
     params = inspect.signature(cls.__init__).parameters
-    return [name for name in params.keys() if name != "self"]
+    return [
+        name
+        for name in params.keys()
+        if name in ("model_name", "model_provider", "paper_path", "references_dir", "code_dir")
+    ]
 
 
 def model_name_input(name: str = "gpt-4o") -> str:
@@ -26,6 +30,7 @@ def paper_path_input() -> str:
     """Get the paper path from the sidebar."""
     uploaded_file = st.sidebar.file_uploader("Upload PDF", type="pdf")
     if uploaded_file is not None:
+        # Save the uploaded file to a temporary directory
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             tmp_file.write(uploaded_file.getvalue())
             return tmp_file.name
@@ -33,13 +38,21 @@ def paper_path_input() -> str:
     # return str(assets_dir / "strainrelief_preprint.pdf")
 
 
-def references_input() -> list[str]:
-    """Get the references from the sidebar."""
-    uploaded_file = st.sidebar.file_uploader("Upload References", type="pdf")
-    if uploaded_file is not None:
-        # TODO: Implement references handling
-        pass
-    return ""
+def references_input() -> str:
+    """Get the references from the sidebar and store them in a temporary directory."""
+    uploaded_files = st.sidebar.file_uploader(
+        "Upload References", type="pdf", accept_multiple_files=True
+    )
+    if uploaded_files:
+        # Create a temporary directory to store the uploaded reference PDFs
+        temp_dir = tempfile.mkdtemp()
+        for uploaded_file in uploaded_files:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf", dir=temp_dir) as tmp_file:
+                tmp_file.write(uploaded_file.getvalue())
+        return temp_dir
+
+    return "./assets/references"
+    # return str(assets_dir / "references")
 
 
 def code_dir_input() -> str:
