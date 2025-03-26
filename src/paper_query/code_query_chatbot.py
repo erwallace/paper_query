@@ -1,13 +1,16 @@
 """
-paper-query-v1 [model] [provider] [paper]
+code-query [model] [provider] [paper] [code]
 
-A chatbot for querying a single paper. The entire paper is held in context.
+RAG chatbot for querying a code repository. Code is stored in embeddings.
 """
 
 import argparse
+from pathlib import Path
 
 from paper_query.chatbots import CodeQueryChatbot
 from paper_query.ui import cli_chatbot
+
+assets_dir = Path(__file__).resolve() / "assets"
 
 
 def main():
@@ -27,13 +30,19 @@ def main():
     parser.add_argument(
         "--paper",
         type=str,
-        default="./assets/strainrelief_preprint.pdf",
+        default=str(assets_dir / "strainrelief_preprint.pdf"),
         help="Path to the paper for the chatbot",
+    )
+    parser.add_argument(
+        "--code",
+        type=str,
+        default="https://github.com/prescient-design/StrainRelief.git",
+        help="URL for the GutHub repository for the chatbot",
     )
     args = parser.parse_args()
 
     # Initialize chatbot with paper and run chatbot
-    chatbot = CodeQueryChatbot(args.model, args.provider, args.paper)
+    chatbot = CodeQueryChatbot(args.model, args.provider, args.paper, args.code)
     cli_chatbot(chatbot)
 
 
