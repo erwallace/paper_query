@@ -11,7 +11,7 @@ from pathlib import Path
 from paper_query.chatbots import PaperQueryPlusChatbot
 from paper_query.ui import cli_chatbot
 
-assets_dir = Path(__file__).resolve() / "assets"
+assets_dir = Path(__file__).resolve().parents[2] / "assets"
 
 
 def main():
