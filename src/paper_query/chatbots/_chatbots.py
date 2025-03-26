@@ -125,6 +125,7 @@ class CodeQueryChatbot(BaseChatbot):
         model_name: str,
         model_provider: str,
         paper_path: str,
+        github_repo_url: str = "https://github.com/prescient-design/StrainRelief.git",
         # split_method: str = "recursive",
         embedding_method: str = "openai",
         retriever_method: str = "base",
@@ -136,7 +137,7 @@ class CodeQueryChatbot(BaseChatbot):
         self.paper_text = pypdf_loader(paper_path)
 
         # Load code
-        self.code = code_loader()
+        self.code = code_loader(github_repo_url)
 
         # Create vectorstore and retriever
         self.vectorstore = create_vectorstore(

@@ -40,9 +40,9 @@ def references_loader(refs_dir: str) -> list[Document]:
     return references
 
 
-def code_loader() -> list[Document]:
+def code_loader(github_repo_url: str) -> list[Document]:
     """Function to load code from a git repository."""
     return GitLoader(
         repo_path=assets_dir / "code",
-        clone_url="https://github.com/prescient-design/StrainRelief.git",
+        clone_url=github_repo_url,
     ).load()

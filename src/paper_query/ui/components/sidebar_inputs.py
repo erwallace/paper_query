@@ -13,7 +13,8 @@ def get_class_params(cls) -> list[str]:
     return [
         name
         for name in params.keys()
-        if name in ("model_name", "model_provider", "paper_path", "references_dir", "code_dir")
+        if name
+        in ("model_name", "model_provider", "paper_path", "references_dir", "github_repo_url")
     ]
 
 
@@ -53,13 +54,9 @@ def references_input() -> str:
     return str(assets_dir / "references")
 
 
-def code_dir_input() -> str:
+def code_dir_input(github_repo_url="https://github.com/prescient-design/StrainRelief.git") -> str:
     """Get the code directory from the sidebar."""
-    uploaded_file = st.sidebar.file_uploader("Upload Code", type="zip")
-    if uploaded_file is not None:
-        # TODO: Implement code directory handling
-        pass
-    return ""
+    return st.sidebar.text_input("GitHub Repository URL", value=github_repo_url)
 
 
 def get_param(param: str) -> str | list[str]:
@@ -69,7 +66,7 @@ def get_param(param: str) -> str | list[str]:
         "model_provider": model_provider_input,
         "paper_path": paper_path_input,
         "references_dir": references_input,
-        "code_dir": code_dir_input,
+        "github_repo_url": code_dir_input,
     }
     if param in param_functions:
         return param_functions[param]()
