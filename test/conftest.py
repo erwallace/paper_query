@@ -1,10 +1,13 @@
 import os
+import sys
 from pathlib import Path
 
 import pytest
-from paper_query.constants import OPENAI_API_KEY
+from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
 
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+if sys.platform != "ubuntu":  # Skip for GitHub actions
+    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+    os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 
 @pytest.fixture(scope="session")
