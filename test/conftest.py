@@ -3,9 +3,10 @@ import sys
 from pathlib import Path
 
 import pytest
-from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
 
 if sys.platform != "ubuntu":  # Skip for GitHub actions
+    from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
+
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
