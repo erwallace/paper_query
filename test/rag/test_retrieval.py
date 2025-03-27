@@ -19,7 +19,7 @@ def test_base_retriever():
     mock_vectorstore.as_retriever.assert_called_once_with(search_kwargs={"k": 10})
 
 
-@pytest.mark.skip(reason="Not implemented yet")
+@pytest.mark.skip(reason="Function not implemented yet")
 def test_contextual_compression_retriever():
     contextual_compression_retriever()
 

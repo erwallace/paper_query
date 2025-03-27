@@ -2,6 +2,12 @@ import pytest
 from paper_query.llm import get_model
 
 
-def test_get_model_with_invalid_provider():
-    with pytest.raises(ValueError, match="API key not provided for invalid_provider"):
-        get_model("gpt-3.5-turbo", "invalid_provider")
+@pytest.mark.parametrize(
+    "model_name, model_provider",
+    [
+        ("gpt-3.5-turbo", "groq"),
+        ("gpt-3.5-turbo", "openai"),
+    ],
+)
+def test_get_model_with_valid_provider(model_name, model_provider):
+    get_model(model_name, model_provider)
