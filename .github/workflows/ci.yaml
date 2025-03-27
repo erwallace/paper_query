@@ -25,8 +25,8 @@ jobs:
         python-version: "3.11"
     - name: Install dependencies
       run: |
-        pip install -f requirements.in
-        pip install -f requirements-dev.in
+        pip install -r requirements.in
+        pip install -r requirements-dev.in
         pre-commit install
     - name: Lint with pre-commit
       run: |
