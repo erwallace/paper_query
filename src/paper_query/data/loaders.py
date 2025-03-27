@@ -5,7 +5,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders.git import GitLoader
 from langchain_community.document_loaders.parsers.images import LLMImageBlobParser
 from langchain_core.documents import Document
-from langchain_openai import ChatOpenAI
+
+from paper_query.llm import get_model
 
 assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
@@ -15,10 +16,13 @@ def pypdf_loader(file_path: str) -> Document:
     return PyPDFLoader(file_path, mode="single").load()[0]
 
 
-def pypdf_loader_w_images(file_path: str, model: str, max_tokens: int = 1024) -> Document:
+def pypdf_loader_w_images(
+    file_path: str, model: str, provider: str, max_tokens: int = 1024
+) -> Document:
     """Function to load text from a PDF file with images."""
-    # TODO: add other models functionality.
-    images_parser = LLMImageBlobParser(model=ChatOpenAI(model=model, max_tokens=max_tokens))
+    images_parser = LLMImageBlobParser(
+        model=get_model(model, provider, max_tokens=max_tokens),
+    )
     return PyPDFLoader(
         file_path,
         mode="single",

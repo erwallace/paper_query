@@ -11,6 +11,7 @@ from paper_query.data.loaders import (
 
 
 def test_pypdf_loader(assets_dir):
+    """Test the pypdf_loader function."""
     path = assets_dir / "example_pdf.pdf"
     doc = pypdf_loader(path)
     assert isinstance(doc, Document)
@@ -18,12 +19,14 @@ def test_pypdf_loader(assets_dir):
 
 @pytest.mark.slow
 def test_pypdf_loader_w_images(assets_dir):
+    """Test the pypdf_loader_w_images function."""
     path = assets_dir / "example_pdf.pdf"
-    doc = pypdf_loader_w_images(path, "gpt-4o-mini")
+    doc = pypdf_loader_w_images(path, "gpt-4o-mini", "openai")
     assert isinstance(doc, Document)
 
 
 def test_references_loader(assets_dir):
+    """Test the references_loader function."""
     refs_dir = assets_dir / "references"
     docs = references_loader(refs_dir)
     assert isinstance(docs, list)
@@ -31,6 +34,7 @@ def test_references_loader(assets_dir):
 
 
 def test_code_loader(assets_dir):
+    """Test the code_loader function."""
     docs = code_loader(
         "https://github.com/prescient-design/StrainRelief.git", repo_path=str(assets_dir / "code")
     )
