@@ -4,9 +4,8 @@ import pytest
 from paper_query.utils import load_api_keys
 
 
-@pytest.mark.skipif(sys.platform == "ubuntu", reason="Skip for GitHub actions")
+@pytest.mark.skipif(sys.platform == "linux", reason="Skip for GitHub actions")
 def test_load_api_keys():
-    print(sys.platform)
     with pytest.raises(FileNotFoundError):
         load_api_keys("non_existent_file")
 

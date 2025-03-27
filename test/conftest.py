@@ -4,8 +4,7 @@ from pathlib import Path
 
 import pytest
 
-if sys.platform != "ubuntu":  # Skip for GitHub actions
-    print(sys.platform)
+if sys.platform != "linux":  # Skip for GitHub actions
     from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
 
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
