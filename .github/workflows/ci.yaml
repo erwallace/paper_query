@@ -25,7 +25,6 @@ jobs:
         python-version: "3.11"
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install -f requirements.in
         pip install -f requirements-dev.in
         pre-commit install
