@@ -1,6 +1,7 @@
 streamlit
 langchain
 langchain-openai
+langchain-groq
 langchain_community
 pypdf
 chromadb
