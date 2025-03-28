@@ -29,22 +29,27 @@ jobs:
         pip install -r requirements-dev.in
         pip install -e .
         pre-commit install
-    - name: Set API keys
-      run: |
-        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
-        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-
-        printenv
     - name: Lint with pre-commit
       run: |
         pre-commit run --files ./**/*
     - name: Unit test
       run: |
+        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
+        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+
         pytest test -m "not app and not integration"
     - name: App test
       run: |
+        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
+        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+
         pytest test -m "app"
     - name: Integration test
       run: |
+        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
+        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+
         pytest test -m "integration"
