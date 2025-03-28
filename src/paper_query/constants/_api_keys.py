@@ -7,6 +7,7 @@ keys = ["OPENAI_API_KEY", "HUGGINGFACE_API_KEY", "GROQ_API_KEY"]
 # via secrets.
 if not all(os.environ.get(key) for key in keys):
     print([os.environ.get(key) for key in keys])
+    print([os.getenv(key) for key in keys])
     api_keys = load_api_keys()
 
     OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
