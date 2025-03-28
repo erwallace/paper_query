@@ -21,7 +21,7 @@ def test_pypdf_loader(assets_dir):
 def test_pypdf_loader_w_images(assets_dir):
     """Test the pypdf_loader_w_images function."""
     path = assets_dir / "example_pdf.pdf"
-    doc = pypdf_loader_w_images(path, "gpt-4o-mini", "openai")
+    doc = pypdf_loader_w_images(path, "llama-3.1-8b-instant", "groq")
     assert isinstance(doc, Document)
 
 
