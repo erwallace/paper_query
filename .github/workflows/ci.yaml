@@ -17,6 +17,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.11
@@ -34,22 +39,10 @@ jobs:
         pre-commit run --files ./**/*
     - name: Unit test
       run: |
-        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
-        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-
         pytest test -m "not app and not integration"
     - name: App test
       run: |
-        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
-        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-
         pytest test -m "app"
     - name: Integration test
       run: |
-        export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-        export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
-        export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-
         pytest test -m "integration"
