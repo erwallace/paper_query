@@ -1,3 +1,5 @@
+import time
+
 from paper_query.chatbots import BaseChatbot
 
 
@@ -18,7 +20,5 @@ def cli_chatbot(chatbot: BaseChatbot):
         print("\nAI: ", end="", flush=True)
         for chunk in chatbot.stream_response(user_input):
             print(chunk, end="", flush=True)
-            import time
-
             time.sleep(0.01)
         print()
