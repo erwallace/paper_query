@@ -6,8 +6,6 @@ keys = ["OPENAI_API_KEY", "HUGGINGFACE_API_KEY", "GROQ_API_KEY"]
 # This is needed so that during GitHub actions testing, the API keys can be loaded from the ci.yaml
 # via secrets.
 if not all(os.environ.get(key) for key in keys):
-    print([os.environ.get(key) for key in keys])
-    print([os.getenv(key) for key in keys])
     api_keys = load_api_keys()
 
     OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
