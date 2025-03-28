@@ -35,9 +35,7 @@ jobs:
         export HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
         export GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
 
-        echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
-        python -c "import os; print(os.environ['OPENAI_API_KEY'])"
-
+        printenv
     - name: Lint with pre-commit
       run: |
         pre-commit run --files ./**/*
