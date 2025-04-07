@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Python application
+name: PaperQuery CI
 
 on:
   push:
@@ -17,6 +17,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.11
@@ -25,9 +30,9 @@ jobs:
         python-version: "3.11"
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -f requirements.in
-        pip install -f requirements-dev.in
+        pip install -r requirements.in
+        pip install -r requirements-dev.in
+        pip install -e .
         pre-commit install
     - name: Lint with pre-commit
       run: |
