@@ -25,7 +25,7 @@ def test_openai_embeddings():
 
 def test_huggingface_embeddings():
     """Test huggingface_embeddings creates a HuggingFaceEmbeddings object."""
-    assert isinstance(huggingface_embeddings(), HuggingFaceEmbeddings)
+    assert isinstance(huggingface_embeddings("all-MiniLM-L6-v2"), HuggingFaceEmbeddings)
 
 
 def test_create_vectorstore_invalid_method():
