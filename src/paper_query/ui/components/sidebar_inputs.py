@@ -20,12 +20,12 @@ def get_class_params(cls) -> list[str]:
 
 def model_name_input(name: str = "gpt-4o") -> str:
     """Get the model name from the sidebar."""
-    return st.sidebar.text_input("Model Name", value=name)
+    return st.sidebar.text_input("Model Name", value=name, key="model_name_input")
 
 
 def model_provider_input(provider: str = "openai") -> str:
     """Get the model provider from the sidebar."""
-    return st.sidebar.text_input("Model Provider", value=provider)
+    return st.sidebar.text_input("Model Provider", value=provider, key="model_provider_input")
 
 
 def paper_path_input() -> str:
