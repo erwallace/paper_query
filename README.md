@@ -1,3 +1,9 @@
+# Paper Query
+
+[intorduction]
+
+# Setup
+
 ## Installation
 ```bash
 mamba env create -f env.yml
@@ -11,6 +17,14 @@ pre-commit install
 API keys are stored in ~/.config/my_api_keys. Youo will need to create and populate this yourself to run the app. Example format:
 ```
 TEMPLATE_API_KEY=some_key
+```
+
+# Usage
+
+## Streamlit App
+
+```
+streamlit run src/paper_query/ui/streamlit.py
 ```
 
 ## Commandline Chatbots
