@@ -1,3 +1,9 @@
+# Paper Query
+
+[intorduction]
+
+# Setup
+
 ## Installation
 ```bash
 mamba env create -f env.yml
@@ -13,13 +19,32 @@ API keys are stored in ~/.config/my_api_keys. Youo will need to create and popul
 TEMPLATE_API_KEY=some_key
 ```
 
+# Usage
+
+## Streamlit App
+
+```
+streamlit run src/paper_query/ui/streamlit.py
+```
+
 ## Commandline Chatbots
 
-### paper-query-v0
-`paper-query-v0 [model] [provider]` is a CLI for a common or garden chatbot.
+### chatbot
+`chatbot [model] [provider]` is a CLI for a common or garden chatbot.
 
-### paper-query-v1
-`paper-query-v1 [model] [provider] [paper]` is a CLI for a chatbot querying a single paper. The entire paper is held in context.
+### paper-query
+`paper-query [model] [provider] [paper]` is a CLI for a chatbot querying a single paper. The entire paper is held in context.
+
+### code-query
+`code-query [model] [provider] [paper]` is a CLI chatbot for querying a single paper. The entire paper is held in context.
+
+### paper-query-plus
+`paper-query-plus [model] [provider] [paper] [references]` is a RAG CLI chatbot for querying a paper and all of its references. The paper is held in context, references are stored in embeddings.
+
+## Unit Tests
+- `pytest tests/` - runs all tests (unit, app and integration)
+- `pytest tests/ -m "app"` - runs all streamlit app tests
+- `pytest tests/ -m "integration"` - runs all integration tests
 
 ## Preprocessing
 1. Load
