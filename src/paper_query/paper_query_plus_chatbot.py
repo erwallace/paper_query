@@ -1,5 +1,5 @@
 """
-paper-query-v2 [model] [provider] [paper] [references]
+paper-query-plus [model] [provider] [paper] [references]
 
 RAG chatbot for querying a paper and all of its references. The paper is held in context,
 references are stored in embeddings.
