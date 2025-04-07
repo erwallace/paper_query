@@ -33,6 +33,13 @@ def test_references_loader(assets_dir):
     assert isinstance(docs[0], Document)
 
 
+def test_references_loader_only_pdf(assets_dir):
+    """Test the references_loader function."""
+    refs_dir = assets_dir / "references"
+    docs = references_loader(refs_dir)
+    assert len(docs) == 1
+
+
 def test_code_loader(assets_dir):
     """Test the code_loader function."""
     docs = code_loader(

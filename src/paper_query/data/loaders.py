@@ -38,9 +38,10 @@ def references_loader(refs_dir: str) -> list[Document]:
 
     references = []
     for file in os.listdir(refs_dir):
-        document = pypdf_loader(os.path.join(refs_dir, file))
-        document.metadata["filename"] = file
-        references.append(document)
+        if file.endswith(".pdf"):
+            document = pypdf_loader(os.path.join(refs_dir, file))
+            document.metadata["filename"] = file
+            references.append(document)
     return references
 
 
