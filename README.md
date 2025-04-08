@@ -6,7 +6,7 @@
 
 ## Installation
 ```bash
-mamba env create -f env.yml
+mamba env create -f environment.yml
 mamba activate paper_query
 pip install -e .
 
