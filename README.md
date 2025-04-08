@@ -23,8 +23,13 @@ TEMPLATE_API_KEY=some_key
 
 ## Streamlit App
 
+There are two streamlit applications: `strain_relief_app.py` contains the StrainRelief paper in the context and references a vectorstore of the code and all paper references.
 ```
-streamlit run src/paper_query/ui/streamlit.py
+streamlit run src/paper_query/ui/strain_relief_app.py
+```
+`custom_app.py` allows customisation of the chatbot, including which model is used and what/how much context is used. Any of the commandline chatbots below can be chosen.
+```
+streamlit run src/paper_query/ui/custom_app.py
 ```
 
 ## Commandline Chatbots

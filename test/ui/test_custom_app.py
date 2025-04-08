@@ -10,7 +10,7 @@ MODEL_PROVIDER = "groq"
 @pytest.fixture
 def app():
     """Returns a streamlit app for testing."""
-    app = AppTest.from_file(str(paths.project_dir / "src/paper_query/ui/streamlit.py"))
+    app = AppTest.from_file(str(paths.project_dir / "src/paper_query/ui/custom_app.py"))
     app.run()
     return app
 

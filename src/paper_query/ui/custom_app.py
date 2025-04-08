@@ -6,6 +6,7 @@ from paper_query.ui.components.sidebar_inputs import get_chatbot_params
 
 
 def streamlit_chatbot():
+    """Customisable chatbot interface for any paper."""
     st.sidebar.title("Chatbot Configuration")
 
     selected_chatbot_class, selected_label = select_chatbot()
