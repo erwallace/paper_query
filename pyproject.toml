@@ -2,7 +2,8 @@
 name = "paper_query"
 description = "A RAG LLM chat-bot that allows you to ask questions about the StrainRelief publication and code repository."
 authors = [{name = "Ewan Wallace"}]
-dynamic = ["version", "readme", "dependencies", "optional-dependencies"]
+version = "0.0"
+dynamic = ["readme", "dependencies", "optional-dependencies"]
 requires-python = ">=3.11"
 
 [tool.setuptools.packages.find]
