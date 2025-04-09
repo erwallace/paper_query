@@ -6,9 +6,12 @@ references are stored in embeddings.
 """
 
 import argparse
+from pathlib import Path
 
 from paper_query.chatbots import PaperQueryPlusChatbot
 from paper_query.ui import cli_chatbot
+
+assets_dir = Path(__file__).resolve().parents[2] / "assets"
 
 
 def main():
@@ -28,13 +31,13 @@ def main():
     parser.add_argument(
         "--paper",
         type=str,
-        default="./assets/strainrelief_preprint.pdf",
+        default=str(assets_dir / "strainrelief_preprint.pdf"),
         help="Path to the paper for the chatbot",
     )
     parser.add_argument(
         "--references",
         type=str,
-        default="./assets/references",
+        default=str(assets_dir / "references"),
         help="Path to the a references directory for use in RAG",
     )
     args = parser.parse_args()

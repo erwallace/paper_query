@@ -1,13 +1,13 @@
 """
-code-query [model] [provider] [paper]
+hybrid-query [model] [provider] [paper] [references] [code]
 
-RAG chatbot for querying a code repository. Code is stored in embeddings.
+RAG chatbot for querying a paper, it's code repository and all of it's references.
 """
 
 import argparse
 from pathlib import Path
 
-from paper_query.chatbots import CodeQueryChatbot
+from paper_query.chatbots import HybridQueryChatbot
 from paper_query.ui import cli_chatbot
 
 assets_dir = Path(__file__).resolve().parents[2] / "assets"
@@ -34,6 +34,12 @@ def main():
         help="Path to the paper for the chatbot",
     )
     parser.add_argument(
+        "--references",
+        type=str,
+        default=str(assets_dir / "references"),
+        help="Path to the a references directory for use in RAG",
+    )
+    parser.add_argument(
         "--code",
         type=str,
         default="https://github.com/prescient-design/StrainRelief.git",
@@ -42,7 +48,7 @@ def main():
     args = parser.parse_args()
 
     # Initialize chatbot with paper and run chatbot
-    chatbot = CodeQueryChatbot(args.model, args.provider, args.paper, args.code)
+    chatbot = HybridQueryChatbot(args.model, args.provider, args.paper, args.references, args.code)
     cli_chatbot(chatbot)
 
 

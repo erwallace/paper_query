@@ -3,6 +3,7 @@ from pathlib import Path
 
 from .base_chatbot import main as base_chatbot
 from .code_query_chatbot import main as code_query_chatbot
+from .hybrid_query_chatbot import main as hybrid_query_chatbot
 from .paper_query_chatbot import main as paper_query_chatbot
 from .paper_query_plus_chatbot import main as paper_query_plus_chatbot
 
@@ -21,5 +22,6 @@ __all__ = [
     "paper_query_chatbot",
     "paper_query_plus_chatbot",
     "code_query_chatbot",
+    "hybrid_query_chatbot",
     "paths",
 ]
