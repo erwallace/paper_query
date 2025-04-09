@@ -1,6 +1,12 @@
+# Paper Query
+
+[intorduction]
+
+# Setup
+
 ## Installation
 ```bash
-mamba env create -f env.yml
+mamba env create -f environment.yml
 mamba activate paper_query
 pip install -e .
 
@@ -13,13 +19,37 @@ API keys are stored in ~/.config/my_api_keys. Youo will need to create and popul
 TEMPLATE_API_KEY=some_key
 ```
 
+# Usage
+
+## Streamlit App
+
+There are two streamlit applications: `strain_relief_app.py` contains the StrainRelief paper in the context and references a vectorstore of the code and all paper references.
+```
+streamlit run src/paper_query/ui/strain_relief_app.py
+```
+`custom_app.py` allows customisation of the chatbot, including which model is used and what/how much context is used. Any of the commandline chatbots below can be chosen.
+```
+streamlit run src/paper_query/ui/custom_app.py
+```
+
 ## Commandline Chatbots
 
-### paper-query-v0
-`paper-query-v0 [model] [provider]` is a CLI for a common or garden chatbot.
+### chatbot
+`chatbot [model] [provider]` is a CLI for a common or garden chatbot.
 
-### paper-query-v1
-`paper-query-v1 [model] [provider] [paper]` is a CLI for a chatbot querying a single paper. The entire paper is held in context.
+### paper-query
+`paper-query [model] [provider] [paper]` is a CLI for a chatbot querying a single paper. The entire paper is held in context.
+
+### code-query
+`code-query [model] [provider] [paper]` is a CLI chatbot for querying a single paper. The entire paper is held in context.
+
+### paper-query-plus
+`paper-query-plus [model] [provider] [paper] [references]` is a RAG CLI chatbot for querying a paper and all of its references. The paper is held in context, references are stored in embeddings.
+
+## Unit Tests
+- `pytest tests/` - runs all tests (unit, app and integration)
+- `pytest tests/ -m "app"` - runs all streamlit app tests
+- `pytest tests/ -m "integration"` - runs all integration tests
 
 ## Preprocessing
 1. Load
@@ -92,5 +122,7 @@ TEMPLATE_API_KEY=some_key
 - Loaders: find a smart way of loading the title and author of each paper for referencing.
 - Embeddings: lokk at how PaperQA2 do thier embeddings. Can I emulate that? does it have a noticable difference?
 - Streamlit: add tab explaining the process used for each chatbot.
-- Streamlit: make upload file more intiative with labels/comments.- Streamlit: infer model provider from model and make model selection a dropdown (with free text option?).
+- Streamlit: make upload file more intiative with labels/comments.
+- Streamlit: infer model provider from model and make model selection a dropdown (with free text option?).
 - Streamlit: deploy to streamlit cloud. Need a way to prevent people using my openai tokens before doing this.
+- General: fix circular imports do that assets_dir is defined globally.

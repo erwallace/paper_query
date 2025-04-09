@@ -6,12 +6,13 @@ from paper_query.ui.components.sidebar_inputs import get_chatbot_params
 
 
 def streamlit_chatbot():
+    """Customisable chatbot interface for any paper."""
     st.sidebar.title("Chatbot Configuration")
 
     selected_chatbot_class, selected_label = select_chatbot()
     chatbot_args = get_chatbot_params(selected_chatbot_class)
 
-    if st.sidebar.button("Confirm Chatbot"):
+    if st.sidebar.button("Confirm Chatbot", key="confirm_chatbot_button"):
         st.session_state.chatbot_confirmed = True
         st.session_state.chatbot = selected_chatbot_class(**chatbot_args)
         st.sidebar.success(f"{selected_label} is ready!")

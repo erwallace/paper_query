@@ -1,5 +1,5 @@
 """
-code-query [model] [provider] [paper] [code]
+code-query [model] [provider] [paper]
 
 RAG chatbot for querying a code repository. Code is stored in embeddings.
 """

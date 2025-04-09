@@ -1,5 +1,5 @@
 """
-paper-query-v1 [model] [provider] [paper]
+paper-query [model] [provider] [paper]
 
 A chatbot for querying a single paper. The entire paper is held in context.
 """
