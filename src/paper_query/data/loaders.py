@@ -6,7 +6,7 @@ from langchain_community.document_loaders.git import GitLoader
 from langchain_community.document_loaders.parsers.images import LLMImageBlobParser
 from langchain_core.documents import Document
 
-from paper_query.llm import get_model
+from paper_query.llm import setup_model
 
 assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
@@ -21,7 +21,7 @@ def pypdf_loader_w_images(
 ) -> Document:
     """Function to load text from a PDF file with images."""
     images_parser = LLMImageBlobParser(
-        model=get_model(model, provider, max_tokens=max_tokens),
+        model=setup_model(model, provider, max_tokens=max_tokens),
     )
     return PyPDFLoader(
         file_path,

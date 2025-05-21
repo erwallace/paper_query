@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from paper_query.data.loaders import code_loader, pypdf_loader, references_loader
 from paper_query.data.processors import split_documents
-from paper_query.llm import get_chain
+from paper_query.llm import setup_chain, setup_model
 from paper_query.llm.prompts import (
     base_prompt,
     code_query_prompt,
@@ -21,11 +21,13 @@ class BaseChatbot:
     """Base class for chatbots."""
 
     def __init__(self, model_name: str, model_provider: str):
-        self.model_name: str = model_name
-        self.model_provider: str = model_provider
+        # self.model_name: str = model_name
+        # self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
+
+        self.model = setup_model(model_name, model_provider)
+        self.chain = setup_chain(self.model, prompt=base_prompt)
 
     def stream_response(self, user_input: str, chain_args: dict = {}) -> Generator[str, None, None]:
         """Process user input and stream AI response."""
@@ -48,9 +50,8 @@ class PaperQueryChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str):
         super().__init__(model_name, model_provider)
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_prompt,
             additional_keys={"paper_text": lambda x: x["paper_text"]},
         )
@@ -95,9 +96,8 @@ class PaperQueryPlusChatbot(BaseChatbot):
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_plus_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -148,9 +148,8 @@ class CodeQueryChatbot(BaseChatbot):
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=code_query_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -182,9 +181,8 @@ class HybridQueryChatbot(BaseChatbot):
         code_dir: str,
     ):
         super().__init__(model_name, model_provider)
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_plus_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],

@@ -1,5 +1,5 @@
 import pytest
-from paper_query.llm import get_model
+from paper_query.llm import setup_model
 
 
 @pytest.mark.parametrize(
@@ -10,4 +10,4 @@ from paper_query.llm import get_model
     ],
 )
 def test_get_model_with_valid_provider(model_name, model_provider):
-    get_model(model_name, model_provider)
+    setup_model(model_name, model_provider)
