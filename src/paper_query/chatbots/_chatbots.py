@@ -21,8 +21,6 @@ class BaseChatbot:
     """Base class for chatbots."""
 
     def __init__(self, model_name: str, model_provider: str):
-        # self.model_name: str = model_name
-        # self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 

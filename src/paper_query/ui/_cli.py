@@ -6,7 +6,6 @@ from paper_query.chatbots import BaseChatbot
 def cli_chatbot(chatbot: BaseChatbot):
     """Run the CLI chatbot interface."""
     print(r"paper-query-v1: LangChain CLI Chatbot.")
-    print(f"Using the {chatbot.model_name} model from {chatbot.model_provider}.")
     print("Type 'exit', 'quit', or 'q' to end the conversation.")
     print("Enter your question about the paper:")
 
