@@ -5,6 +5,7 @@ from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings
+from loguru import logger
 
 PERSIST_DIRECTORY = str(Path(__file__).resolve().parents[3] / "vectorstore")
 
@@ -34,6 +35,8 @@ def get_embedding_method(embedding_method: str) -> callable:
     if embedding_method not in EMBEDDING_METHODS:
         raise KeyError(f"Unsupported embedding method: {embedding_method}")
 
+    logger.info(f"Using embedding method: {embedding_method}")
+
     return EMBEDDING_METHODS[embedding_method]
 
 
@@ -45,6 +48,7 @@ def create_vectorstore(
 ) -> Chroma:
     """Create a vectorstore from a list of documents."""
     embedding_function = get_embedding_method(embedding_method)(**embedding_kwargs)
+    logger.info(f"Creating vectorstore with {len(documents)} documents.")
     return Chroma.from_documents(documents, embedding_function, persist_directory=persist_directory)
 
 
@@ -58,6 +62,7 @@ def setup_vectorstore(
         raise ValueError(f"Persist directory does not exist: {persist_directory}")
 
     embedding_function = get_embedding_method(embedding_method)(**embedding_kwargs)
+    logger.info(f"Loading vectorstore from {persist_directory}.")
     return Chroma(
         persist_directory=persist_directory,
         embedding_function=embedding_function,

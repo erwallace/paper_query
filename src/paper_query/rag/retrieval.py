@@ -1,4 +1,5 @@
 from langchain_community.vectorstores import Chroma
+from loguru import logger
 
 
 def base_retriever(vectorstore: Chroma, k: int = 5):
@@ -27,5 +28,7 @@ def setup_retriever(vectorstore: Chroma, method: str = "base", **kwargs):
     """Set up a retriever."""
     if method not in RETREIVER_METHODS:
         raise KeyError(f"Unsupported retriever method: {method}")
+
+    logger.info(f"Setting up retriever with method: {method}")
 
     return RETREIVER_METHODS[method](vectorstore, **kwargs)
