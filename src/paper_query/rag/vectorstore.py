@@ -38,11 +38,14 @@ def get_embedding_method(embedding_method: str) -> callable:
 
 
 def create_vectorstore(
-    documents: list[Document], embedding_method: str = "openai", **kwargs
+    documents: list[Document],
+    embedding_method: str = "openai",
+    persist_directory: str = PERSIST_DIRECTORY,
+    **embedding_kwargs,
 ) -> Chroma:
     """Create a vectorstore from a list of documents."""
-    embeddings = get_embedding_method(embedding_method)(**kwargs)
-    return Chroma.from_documents(documents, embeddings)
+    embedding_function = get_embedding_method(embedding_method)(**embedding_kwargs)
+    return Chroma.from_documents(documents, embedding_function, persist_directory=persist_directory)
 
 
 def setup_vectorstore(
@@ -54,10 +57,10 @@ def setup_vectorstore(
     if not os.path.exists(persist_directory):
         raise ValueError(f"Persist directory does not exist: {persist_directory}")
 
-    embeddings = get_embedding_method(embedding_method)(**embedding_kwargs)
+    embedding_function = get_embedding_method(embedding_method)(**embedding_kwargs)
     return Chroma(
         persist_directory=persist_directory,
-        embedding_function=embeddings,
-        create_collection_if_not_exists=False,
-        collection_name="paper-query",
+        embedding_function=embedding_function,
+        # create_collection_if_not_exists=False,
+        # collection_name="paper-query",
     )
