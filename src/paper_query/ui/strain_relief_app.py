@@ -51,4 +51,11 @@ def strain_relief_chatbot():
 
 
 if __name__ == "__main__":
+    # Get API keys from Streamlit secrets
+    from paper_query import constants
+
+    constants.OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+    constants.GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+    constants.HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
+
     strain_relief_chatbot()
