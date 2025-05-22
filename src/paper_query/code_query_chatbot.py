@@ -18,7 +18,7 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        default="gpt-4o",
+        default="gpt-4.1",
         help="Model name to use for the chatbot",
     )
     parser.add_argument(

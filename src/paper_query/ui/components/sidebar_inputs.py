@@ -17,7 +17,7 @@ def get_class_params(cls) -> list[str]:
     ]
 
 
-def model_name_input(name: str = "gpt-4o") -> str:
+def model_name_input(name: str = "gpt-4.1") -> str:
     """Get the model name from the sidebar."""
     return st.sidebar.text_input("Model Name", value=name, key="model_name_input")
 

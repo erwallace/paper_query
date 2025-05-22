@@ -31,7 +31,7 @@ def test_confirm_chatbot(app):
 @pytest.mark.app
 def test_model_selection(app):
     """Test model selection text input."""
-    assert app.sidebar.text_input("model_name_input").value == "gpt-4o"
+    assert app.sidebar.text_input("model_name_input").value == "gpt-4.1"
     app.sidebar.text_input("model_name_input").set_value(MODEL_NAME)
     assert app.sidebar.text_input("model_name_input").value == MODEL_NAME
 

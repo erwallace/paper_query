@@ -27,6 +27,7 @@ def setup_sidebar() -> str | None:
         "OpenAI API Key",
         type="password",
         help="If you don't have an API key, you can get one from [OpenAI](https://platform.openai.com/api-keys).",
+        key="api_input",
     )
 
     if not openai_api_key:
@@ -36,7 +37,7 @@ def setup_sidebar() -> str | None:
 
     # Validate API key
     try:
-        chat = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4o-mini")
+        chat = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4.1-nano")
         chat.invoke("Hello")
         logger.debug("API key validation successful.")
         return openai_api_key
