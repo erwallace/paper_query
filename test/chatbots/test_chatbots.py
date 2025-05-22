@@ -48,7 +48,6 @@ def test_code_query_chatbot(test_assets_dir):
     chatbot.stream_response("Hello")
 
 
-@pytest.mark.skip("Function not yet implemented")
 @pytest.mark.integration
 def test_hybrid_query_chatbot(test_assets_dir):
     chatbot = HybridQueryChatbot(
