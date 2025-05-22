@@ -1,14 +1,20 @@
+import sys
 import time
 
+from loguru import logger
+
 from paper_query.chatbots import BaseChatbot
+
+# Configure logger to use INFO level
+logger.remove()
+logger.add(sys.stderr, level="INFO")
 
 
 def cli_chatbot(chatbot: BaseChatbot):
     """Run the CLI chatbot interface."""
-    print(r"paper-query-v1: LangChain CLI Chatbot.")
-    print(f"Using the {chatbot.model_name} model from {chatbot.model_provider}.")
-    print("Type 'exit', 'quit', or 'q' to end the conversation.")
-    print("Enter your question about the paper:")
+    logger.info(r"paper-query-v1: LangChain CLI Chatbot.")
+    logger.info("Type 'exit', 'quit', or 'q' to end the conversation.")
+    logger.info("Enter your question about the paper:")
 
     while True:
         user_input = input("\nYou: ")

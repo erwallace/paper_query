@@ -8,3 +8,4 @@ pypdf
 chromadb
 sentence-transformers
 accelerate
+loguru

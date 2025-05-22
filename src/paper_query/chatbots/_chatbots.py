@@ -2,11 +2,12 @@ from collections.abc import Generator
 
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from loguru import logger
 
 from paper_query.constants import RAG_DOC_ID
 from paper_query.data.loaders import code_loader, pypdf_loader, references_loader
 from paper_query.data.processors import split_documents
-from paper_query.llm import get_chain
+from paper_query.llm import setup_chain, setup_model
 from paper_query.llm.prompts import (
     base_prompt,
     code_query_prompt,
@@ -22,15 +23,16 @@ class BaseChatbot:
     """Base class for chatbots."""
 
     def __init__(self, model_name: str, model_provider: str):
-        self.model_name: str = model_name
-        self.model_provider: str = model_provider
         self.chat_history: list[BaseMessage] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
+
+        self.model = setup_model(model_name, model_provider)
+        self.chain = setup_chain(self.model, prompt=base_prompt)
 
     def stream_response(self, user_input: str, chain_args: dict = {}) -> Generator[str, None, None]:
         """Process user input and stream AI response."""
         # Add user message to history before streaming
+        logger.debug(f'User input:\n"{user_input}"')
         self.chat_history.append(HumanMessage(content=user_input))
 
         full_response = ""
@@ -42,6 +44,7 @@ class BaseChatbot:
 
         # After streaming is complete, add the full response to chat history
         self.chat_history.append(AIMessage(content=full_response))
+        logger.debug(f'AI response:\n"{full_response}"')
 
 
 class PaperQueryChatbot(BaseChatbot):
@@ -49,9 +52,9 @@ class PaperQueryChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str):
         super().__init__(model_name, model_provider)
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        logger.info("Initializing PaperQueryChatbot...")
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_prompt,
             additional_keys={"paper_text": lambda x: x["paper_text"]},
         )
@@ -77,6 +80,7 @@ class PaperQueryPlusChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
+        logger.info("Initializing PaperQueryPlusChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -96,9 +100,8 @@ class PaperQueryPlusChatbot(BaseChatbot):
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_plus_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -112,6 +115,16 @@ class PaperQueryPlusChatbot(BaseChatbot):
         relevant_references = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get("filename", "N/A")}
+                Page Content: {contents}...
+            """
+            )
 
         return super().stream_response(
             user_input, {"paper_text": self.paper_text, "relevant_references": relevant_references}
@@ -133,6 +146,7 @@ class CodeQueryChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
+        logger.info("Initializing CodeQueryChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -149,9 +163,8 @@ class CodeQueryChatbot(BaseChatbot):
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=code_query_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -165,6 +178,16 @@ class CodeQueryChatbot(BaseChatbot):
         relevant_code = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get("filename", "N/A")}
+                Page Content: {contents}...
+            """
+            )
 
         return super().stream_response(
             user_input, {"paper_text": self.paper_text, "relevant_code": relevant_code}
@@ -187,6 +210,7 @@ class HybridQueryChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
+        logger.info("Initializing HybridQueryChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -211,9 +235,8 @@ class HybridQueryChatbot(BaseChatbot):
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=hybrid_query_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
