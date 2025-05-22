@@ -6,7 +6,7 @@ from langchain_community.document_loaders.parsers.images import LLMImageBlobPars
 from langchain_core.documents import Document
 from loguru import logger
 
-from paper_query.constants import assets_dir
+from paper_query.constants import RAG_DOC_ID, assets_dir
 from paper_query.llm import setup_model
 
 
@@ -43,7 +43,7 @@ def references_loader(refs_dir: str) -> list[Document]:
     for file in os.listdir(refs_dir):
         if file.endswith(".pdf"):
             document = pypdf_loader(os.path.join(refs_dir, file))
-            document.metadata["filename"] = file
+            document.metadata[RAG_DOC_ID] = file
             references.append(document)
     return references
 
@@ -51,7 +51,10 @@ def references_loader(refs_dir: str) -> list[Document]:
 def code_loader(github_repo_url: str, repo_path: str = str(assets_dir / "code")) -> list[Document]:
     """Function to load code from a git repository."""
     logger.info(f"Loading code repository from {github_repo_url}")
-    return GitLoader(
+    code = GitLoader(
         repo_path=repo_path,
         clone_url=github_repo_url,
     ).load()
+    for file in code:
+        file.metadata[RAG_DOC_ID] = file.metadata["file_path"]
+    return code

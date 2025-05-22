@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
@@ -7,7 +6,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from loguru import logger
 
-PERSIST_DIRECTORY = str(Path(__file__).resolve().parents[3] / "vectorstore")
+from paper_query.constants import PERSIST_DIRECTORY
 
 
 def openai_embeddings():
@@ -16,7 +15,7 @@ def openai_embeddings():
         raise ValueError(
             "OPENAI_API_KEY environment variable must be set to use OpenAI embeddings."
         )
-    return OpenAIEmbeddings()
+    return OpenAIEmbeddings(chunk_size=100)
 
 
 def huggingface_embeddings(model_name="sentence-transformers/all-mpnet-base-v2"):

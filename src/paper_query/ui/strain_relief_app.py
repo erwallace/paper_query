@@ -1,18 +1,27 @@
-import streamlit as st
+import sys
 
-from paper_query.chatbots import PaperQueryChatbot
+import streamlit as st
+from loguru import logger
+
+from paper_query.chatbots import HybridQueryChatbot
 from paper_query.constants import assets_dir
 from paper_query.ui.components.chat_interface import display_chat_interface
+
+# Configure logger to use DEBUG level
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
 
 
 def strain_relief_chatbot():
     """Chatbot for the StrainRelief paper."""
     st.session_state.chatbot_confirmed = True
-    st.session_state.chatbot = PaperQueryChatbot(
-        model_name="gpt-4o",
-        model_provider="openai",
-        paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
-    )
+    if "chatbot" not in st.session_state:
+        st.session_state.chatbot = HybridQueryChatbot(
+            model_name="gpt-4o",
+            model_provider="openai",
+            paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
+            references_dir=str(assets_dir / "references"),
+        )
 
     st.title("The StrainRelief Chatbot")
 
