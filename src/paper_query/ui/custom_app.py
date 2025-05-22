@@ -1,8 +1,15 @@
+import sys
+
 import streamlit as st
+from loguru import logger
 
 from paper_query.ui.components.chat_interface import display_chat_interface
 from paper_query.ui.components.chatbot_selector import select_chatbot
 from paper_query.ui.components.sidebar_inputs import get_chatbot_params
+
+# Configure logger to use DEBUG level
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
 
 
 def streamlit_chatbot():
