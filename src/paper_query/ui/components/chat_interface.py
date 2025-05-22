@@ -10,7 +10,7 @@ def display_chat_interface() -> None:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if "chatbot_confirmed" in st.session_state and st.session_state.chatbot_confirmed:
+    if "chatbot_ready" in st.session_state and st.session_state.chatbot_ready:
         if user_input := st.chat_input("What is your question?", key="user_input"):
             st.chat_message("user").markdown(user_input)
             st.session_state.messages.append({"role": "user", "content": user_input})
