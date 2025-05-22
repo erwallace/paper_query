@@ -16,7 +16,7 @@ def openai_embeddings():
         raise ValueError(
             "OPENAI_API_KEY environment variable must be set to use OpenAI embeddings."
         )
-    return OpenAIEmbeddings()
+    return OpenAIEmbeddings(chunk_size=100)
 
 
 def huggingface_embeddings(model_name="sentence-transformers/all-mpnet-base-v2"):
