@@ -29,10 +29,8 @@ def strain_relief_chatbot():
 
     with chat_tab:
         st.markdown(
-            "This retrieval augmented generation (RAG) chatbot is designed to answer questions "
-            "about the StrainRelief. The chatbot has access to the "
-            "[paper](https://arxiv.org/abs/2503.13352), all references, and the code "
-            "[repository](https://github.com/prescient-design/StrainRelief)."
+            "This chatbot is built using a hybrid retrieval and cached augmented generation "
+            "(RAG/CAG) approach. \nTo find out more read the 'About' tab above."
         )
         if "messages" not in st.session_state:
             st.markdown(
@@ -47,7 +45,7 @@ def strain_relief_chatbot():
                 "neutral molecules with quantum accuracy. We show that this tool estimates "
                 "strain energy differences relative to DFT to within 1.4 kcal/mol, more "
                 "accurately than alternative NNPs. These results highlight the utility of NNPs "
-                "in drug discovery, and provide a useful tool for drug discovery teams."
+                "in drug discovery, and provide a useful tool for drug discovery teams.]"
             )
 
         display_chat_interface()
