@@ -11,7 +11,7 @@ MODEL_PROVIDER = "groq"
 def app():
     """Returns a streamlit app for testing."""
     app = AppTest.from_file(str(src_dir / "paper_query/ui/strain_relief_app.py"))
-    app.run()
+    app.run(timeout=10)
     return app
 
 
