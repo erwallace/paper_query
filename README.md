@@ -8,7 +8,6 @@
 ```bash
 mamba env create -f environment.yml
 mamba activate paper_query
-pip install -e .
 
 pre-commit install
 ```
