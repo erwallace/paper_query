@@ -7,3 +7,4 @@ dependencies:
   - pip:
     - -r requirements.in
     - -r requirements-dev.in
+    - -e .
