@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders.git import GitLoader
@@ -7,10 +6,8 @@ from langchain_community.document_loaders.parsers.images import LLMImageBlobPars
 from langchain_core.documents import Document
 from loguru import logger
 
-from paper_query.constants import RAG_DOC_ID
+from paper_query.constants import RAG_DOC_ID, assets_dir
 from paper_query.llm import setup_model
-
-assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
 
 def pypdf_loader(file_path: str) -> Document:
