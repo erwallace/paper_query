@@ -1,5 +1,5 @@
 import pytest
-from paper_query import paths
+from paper_query.constants import src_dir
 from streamlit.testing.v1 import AppTest
 
 # TODO: max context of 6,000 tokens. Most chatbots require more to hold the paper in context.
@@ -10,7 +10,7 @@ MODEL_PROVIDER = "groq"
 @pytest.fixture
 def app():
     """Returns a streamlit app for testing."""
-    app = AppTest.from_file(str(paths.project_dir / "src/paper_query/ui/custom_app.py"))
+    app = AppTest.from_file(str(src_dir / "paper_query/ui/custom_app.py"))
     app.run()
     return app
 

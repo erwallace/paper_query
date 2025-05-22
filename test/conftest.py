@@ -8,6 +8,7 @@ from langchain_core.documents import Document
 from langchain_core.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import OpenAIEmbeddings
+from paper_query.constants import test_dir
 
 if sys.platform != "linux":  # Skip for GitHub actions
     from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
@@ -16,9 +17,9 @@ if sys.platform != "linux":  # Skip for GitHub actions
     os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 
-@pytest.fixture(scope="session")
-def assets_dir():
-    return Path(__file__).resolve().parents[0] / "assets"
+@pytest.fixture
+def test_assets_dir() -> Path:
+    return test_dir / "assets"
 
 
 @pytest.fixture

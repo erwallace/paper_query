@@ -1,10 +1,9 @@
 import inspect
 import tempfile
-from pathlib import Path
 
 import streamlit as st
 
-assets_dir = Path(__file__).resolve().parents[4] / "assets"
+from paper_query.constants import assets_dir
 
 
 def get_class_params(cls) -> list[str]:

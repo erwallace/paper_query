@@ -1,27 +1,15 @@
-from pathlib import Path
-
 import pytest
 from paper_query.chatbots import BaseChatbot
+from paper_query.constants import assets_dir
 from paper_query.ui.components.sidebar_inputs import (
     code_dir_input,
     get_chatbot_params,
-    get_class_params,
     get_param,
     model_name_input,
     model_provider_input,
     paper_path_input,
     references_input,
 )
-
-assets_dir = Path(__file__).resolve().parents[3] / "assets"
-
-
-def test_get_class_params():
-    class TestClass:
-        def __init__(self, model_name, model_provider, other_param):
-            pass
-
-    assert get_class_params(TestClass) == ["model_name", "model_provider"]
 
 
 def test_model_name_input():
