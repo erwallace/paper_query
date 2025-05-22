@@ -23,6 +23,7 @@ class BaseChatbot:
     """Base class for chatbots."""
 
     def __init__(self, model_name: str, model_provider: str):
+        logger.info(f"Initializing {self.__class__.__name__}...")
         self.chat_history: list[BaseMessage] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -52,7 +53,6 @@ class PaperQueryChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str):
         super().__init__(model_name, model_provider)
-        logger.info("Initializing PaperQueryChatbot...")
         self.chain = setup_chain(
             self.model,
             prompt=paper_query_prompt,
@@ -80,7 +80,6 @@ class PaperQueryPlusChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
-        logger.info("Initializing PaperQueryPlusChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -146,7 +145,6 @@ class CodeQueryChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
-        logger.info("Initializing CodeQueryChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -210,7 +208,6 @@ class HybridQueryChatbot(BaseChatbot):
         **kwargs,
     ):
         super().__init__(model_name, model_provider)
-        logger.info("Initializing HybridQueryChatbot...")
 
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
@@ -250,6 +247,16 @@ class HybridQueryChatbot(BaseChatbot):
         relevant_references = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get(RAG_DOC_ID, "N/A")}
+                Page Content: {contents}...
+            """
+            )
 
         return super().stream_response(
             user_input,
