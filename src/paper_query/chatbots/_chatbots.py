@@ -1,10 +1,11 @@
+import os
 from collections.abc import Generator
 
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from loguru import logger
 
-from paper_query.constants import RAG_DOC_ID
+from paper_query.constants import PERSIST_DIRECTORY, RAG_DOC_ID
 from paper_query.data.loaders import code_loader, pypdf_loader, references_loader
 from paper_query.data.processors import split_documents
 from paper_query.llm import setup_chain, setup_model
@@ -16,7 +17,7 @@ from paper_query.llm.prompts import (
     paper_query_prompt,
 )
 from paper_query.rag.retrieval import setup_retriever
-from paper_query.rag.vectorstore import create_vectorstore
+from paper_query.rag.vectorstore import create_vectorstore, setup_vectorstore
 
 
 class BaseChatbot:
@@ -84,16 +85,22 @@ class PaperQueryPlusChatbot(BaseChatbot):
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        # Process references for embeddings
-        self.references = references_loader(references_dir)
-        split_docs = split_documents(
-            self.references, method=split_method, **kwargs.get("split_kwargs", {})
-        )
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.references = references_loader(references_dir)
+            split_docs = split_documents(
+                self.references, method=split_method, **kwargs.get("split_kwargs", {})
+            )
+            self.vectorstore = create_vectorstore(
+                split_docs, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
 
-        # Create vectorstore and retriever
-        self.vectorstore = create_vectorstore(
-            split_docs, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
-        )
         self.retriever = setup_retriever(
             self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
         )
@@ -149,13 +156,19 @@ class CodeQueryChatbot(BaseChatbot):
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        # Load code
-        self.code = code_loader(github_repo_url)
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.code = code_loader(github_repo_url)
+            self.vectorstore = create_vectorstore(
+                self.code, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
 
-        # Create vectorstore and retriever
-        self.vectorstore = create_vectorstore(
-            self.code, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
-        )
         self.retriever = setup_retriever(
             self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
         )
@@ -212,21 +225,25 @@ class HybridQueryChatbot(BaseChatbot):
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        # Load code
-        self.code = code_loader(github_repo_url)
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.code = code_loader(github_repo_url)
+            self.references = references_loader(references_dir)
+            split_docs = split_documents(
+                self.references, method=split_method, **kwargs.get("split_kwargs", {})
+            )
+            self.vectorstore = create_vectorstore(
+                self.code + split_docs,
+                embedding_method=embedding_method,
+                **kwargs.get("embedding_kwargs", {}),
+            )
 
-        # Process references for embeddings
-        self.references = references_loader(references_dir)
-        split_docs = split_documents(
-            self.references, method=split_method, **kwargs.get("split_kwargs", {})
-        )
-
-        # Create vectorstore and retriever
-        self.vectorstore = create_vectorstore(
-            self.code + split_docs,
-            embedding_method=embedding_method,
-            **kwargs.get("embedding_kwargs", {}),
-        )
         self.retriever = setup_retriever(
             self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
         )
