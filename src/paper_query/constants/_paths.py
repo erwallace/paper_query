@@ -7,4 +7,4 @@ test_dir: Path = project_dir / "test"
 data_dir: Path = project_dir / "data"
 assets_dir: Path = project_dir / "assets"
 
-PERSIST_DIRECTORY: str = project_dir / "vectorstore"
+PERSIST_DIRECTORY: str = str(project_dir / "vectorstore")
