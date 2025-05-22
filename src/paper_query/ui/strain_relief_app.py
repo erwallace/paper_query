@@ -6,6 +6,7 @@ from loguru import logger
 from paper_query.chatbots import HybridQueryChatbot
 from paper_query.constants import assets_dir
 from paper_query.ui.components.chat_interface import display_chat_interface
+from paper_query.ui.components.sidebar_api import setup_sidebar
 
 # Configure logger to use DEBUG level
 logger.remove()
@@ -14,24 +15,19 @@ logger.add(sys.stderr, level="DEBUG")
 
 def strain_relief_chatbot():
     """Chatbot for the StrainRelief paper."""
-    st.session_state.chatbot_confirmed = True
-    if "chatbot" not in st.session_state:
-        st.session_state.chatbot = HybridQueryChatbot(
-            model_name="gpt-4o",
-            model_provider="openai",
-            paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
-            references_dir=str(assets_dir / "references"),
-        )
+    if "chatbot_ready" not in st.session_state:
+        st.session_state.chatbot_ready = False
+
+    # Setup sidebar and get validated API key
+    openai_api_key = setup_sidebar()
+    if openai_api_key:
+        st.session_state.chatbot_ready = True
 
     st.title("The StrainRelief Chatbot")
 
     chat_tab, about_tab = st.tabs(["Chat", "About"])
 
     with chat_tab:
-        st.markdown(
-            "This chatbot is built using a hybrid retrieval and cached augmented generation "
-            "(RAG/CAG) approach. \nTo find out more read the 'About' tab above."
-        )
         if "messages" not in st.session_state:
             st.markdown(
                 ":gray[**Abstract**: Ligand strain energy, the energy difference between the bound "
@@ -48,7 +44,24 @@ def strain_relief_chatbot():
                 "in drug discovery, and provide a useful tool for drug discovery teams.]"
             )
 
-        display_chat_interface()
+        if st.session_state.chatbot_ready:
+            # Only initialize the chatbot if API key is provided
+            if "chatbot" not in st.session_state:
+                # Import here to avoid circular imports
+                from paper_query import constants
+
+                constants.OPENAI_API_KEY = openai_api_key
+
+                st.session_state.chatbot = HybridQueryChatbot(
+                    model_name="gpt-4o",
+                    model_provider="openai",
+                    paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
+                    references_dir=str(assets_dir / "references"),
+                )
+
+            display_chat_interface()
+        else:
+            st.info("Please enter your OpenAI API key in the sidebar to start chatting.")
 
     with about_tab:
         st.markdown(
@@ -93,12 +106,4 @@ def strain_relief_chatbot():
 
 
 if __name__ == "__main__":
-    if sys.platform != "linux":  # Skip for GitHub actions
-        # Get API keys from Streamlit secrets
-        from paper_query import constants
-
-        constants.OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-        constants.GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-        constants.HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
-
     strain_relief_chatbot()
