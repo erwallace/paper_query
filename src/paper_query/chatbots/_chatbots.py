@@ -175,7 +175,7 @@ class CodeQueryChatbot(BaseChatbot):
         # Retrieve relevant reference information
         relevant_docs = self.retriever.invoke(user_input)
         relevant_code = "\n".join(
-            [f"From {doc.metadata['filename']}:\n{doc.page_content}" for doc in relevant_docs]
+            [f"From {doc.metadata['file_path']}:\n{doc.page_content}" for doc in relevant_docs]
         )
         print(relevant_code)
         assert True is False
