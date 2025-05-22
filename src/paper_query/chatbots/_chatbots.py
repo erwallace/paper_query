@@ -177,8 +177,6 @@ class CodeQueryChatbot(BaseChatbot):
         relevant_code = "\n".join(
             [f"From {doc.metadata['file_path']}:\n{doc.page_content}" for doc in relevant_docs]
         )
-        print(relevant_code)
-        assert True is False
 
         # Log the context documents
         logger.debug(f"Context: {len(relevant_docs)} documents returned.")
