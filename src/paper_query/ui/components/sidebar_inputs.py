@@ -1,12 +1,9 @@
 import inspect
 import tempfile
-from pathlib import Path
 
 import streamlit as st
 
-from paper_query.constants import MODEL_PROVIDER_MAP
-
-assets_dir = Path(__file__).resolve().parents[4] / "assets"
+from paper_query.constants import MODEL_PROVIDER_MAP, assets_dir
 
 
 def get_class_params(cls) -> list[str]:
@@ -21,7 +18,9 @@ def get_class_params(cls) -> list[str]:
 
 def model_name_input() -> str:
     """Get the model name from the sidebar."""
-    return st.sidebar.selectbox("Choose a model:", list(MODEL_PROVIDER_MAP.keys()))
+    return st.sidebar.selectbox(
+        "Choose a model:", list(MODEL_PROVIDER_MAP.keys()), key="model_name_input"
+    )
 
 
 def paper_path_input() -> str:

@@ -1,5 +1,5 @@
 """
-paper-query-v1 [model] [provider]
+chatbot [model] [provider]
 
 A common or garden CLI chatbot.
 """

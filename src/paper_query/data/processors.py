@@ -1,5 +1,6 @@
-from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from loguru import logger
 
 
 def split_with_recursive_character(
@@ -21,16 +22,19 @@ def _split_documents(documents: list[Document], splitter) -> list[Document]:
     return split_docs
 
 
+SPLITTING_METHODS = {
+    "recursive": split_with_recursive_character,
+    # add more splitting methods here...
+}
+
+
 def split_documents(
     documents: list[Document], method: str = "recursive", **kwargs
 ) -> list[Document]:
     """Split documents using a given method."""
-    splitting_methods = {
-        "recursive": split_with_recursive_character,
-        # add more splitting methods here...
-    }
-
-    if method not in splitting_methods:
+    if method not in SPLITTING_METHODS:
         raise ValueError(f"Unsupported splitting method: {method}")
 
-    return splitting_methods[method](documents, **kwargs)
+    logger.info(f"Using splitting method: {method}")
+
+    return SPLITTING_METHODS[method](documents, **kwargs)

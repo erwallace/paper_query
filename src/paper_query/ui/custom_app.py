@@ -1,17 +1,25 @@
+import sys
+
 import streamlit as st
+from loguru import logger
 
 from paper_query.ui.components.chat_interface import display_chat_interface
 from paper_query.ui.components.chatbot_selector import select_chatbot
 from paper_query.ui.components.sidebar_inputs import get_chatbot_params
 
+# Configure logger to use DEBUG level
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
+
 
 def streamlit_chatbot():
+    """Customisable chatbot interface for any paper."""
     st.sidebar.title("Chatbot Configuration")
 
     selected_chatbot_class, selected_label = select_chatbot()
     chatbot_args = get_chatbot_params(selected_chatbot_class)
 
-    if st.sidebar.button("Confirm Chatbot"):
+    if st.sidebar.button("Confirm Chatbot", key="confirm_chatbot_button"):
         st.session_state.chatbot_confirmed = True
         st.session_state.chatbot = selected_chatbot_class(**chatbot_args)
         st.sidebar.success(f"{selected_label} is ready!")

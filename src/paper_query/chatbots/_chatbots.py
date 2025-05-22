@@ -3,33 +3,38 @@ from collections.abc import Generator
 
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from loguru import logger
 
+from paper_query.constants import PERSIST_DIRECTORY, RAG_DOC_ID
 from paper_query.data.loaders import code_loader, pypdf_loader, references_loader
 from paper_query.data.processors import split_documents
-from paper_query.llm import get_chain
+from paper_query.llm import setup_chain, setup_model
 from paper_query.llm.prompts import (
     base_prompt,
     code_query_prompt,
+    hybrid_query_prompt,
     paper_query_plus_prompt,
     paper_query_prompt,
 )
 from paper_query.rag.retrieval import setup_retriever
-from paper_query.rag.vectorstore import create_vectorstore
+from paper_query.rag.vectorstore import create_vectorstore, setup_vectorstore
 
 
 class BaseChatbot:
     """Base class for chatbots."""
 
     def __init__(self, model_name: str, model_provider: str):
-        self.model_name: str = model_name
-        self.model_provider: str = model_provider
+        logger.info(f"Initializing {self.__class__.__name__}...")
         self.chat_history: list[BaseMessage] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        self.chain = get_chain(model_name, model_provider, prompt=base_prompt)
+
+        self.model = setup_model(model_name, model_provider)
+        self.chain = setup_chain(self.model, prompt=base_prompt)
 
     def stream_response(self, user_input: str, chain_args: dict = {}) -> Generator[str, None, None]:
         """Process user input and stream AI response."""
         # Add user message to history before streaming
+        logger.debug(f'User input:\n"{user_input}"')
         self.chat_history.append(HumanMessage(content=user_input))
 
         full_response = ""
@@ -41,6 +46,7 @@ class BaseChatbot:
 
         # After streaming is complete, add the full response to chat history
         self.chat_history.append(AIMessage(content=full_response))
+        logger.debug(f'AI response:\n"{full_response}"')
 
 
 class PaperQueryChatbot(BaseChatbot):
@@ -48,9 +54,8 @@ class PaperQueryChatbot(BaseChatbot):
 
     def __init__(self, model_name: str, model_provider: str, paper_path: str):
         super().__init__(model_name, model_provider)
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_prompt,
             additional_keys={"paper_text": lambda x: x["paper_text"]},
         )
@@ -80,24 +85,29 @@ class PaperQueryPlusChatbot(BaseChatbot):
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        # Process references for embeddings
-        self.references = references_loader(references_dir)
-        split_docs = split_documents(
-            self.references, method=split_method, **kwargs.get("split_kwargs", {})
-        )
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.references = references_loader(references_dir)
+            split_docs = split_documents(
+                self.references, method=split_method, **kwargs.get("split_kwargs", {})
+            )
+            self.vectorstore = create_vectorstore(
+                split_docs, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
 
-        # Create vectorstore and retriever
-        self.vectorstore = create_vectorstore(
-            split_docs, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
-        )
         self.retriever = setup_retriever(
             self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=paper_query_plus_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -109,8 +119,18 @@ class PaperQueryPlusChatbot(BaseChatbot):
         # Retrieve relevant reference information
         relevant_docs = self.retriever.invoke(user_input)
         relevant_references = "\n".join(
-            [f"From {doc.metadata['filename']}:\n{doc.page_content}" for doc in relevant_docs]
+            [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get("filename", "N/A")}
+                Page Content: {contents}...
+            """
+            )
 
         return super().stream_response(
             user_input, {"paper_text": self.paper_text, "relevant_references": relevant_references}
@@ -136,21 +156,26 @@ class CodeQueryChatbot(BaseChatbot):
         # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        # Load code
-        self.code = code_loader(github_repo_url)
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.code = code_loader(github_repo_url)
+            self.vectorstore = create_vectorstore(
+                self.code, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
 
-        # Create vectorstore and retriever
-        self.vectorstore = create_vectorstore(
-            self.code, embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
-        )
         self.retriever = setup_retriever(
             self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
         )
 
         # Update the chain
-        self.chain = get_chain(
-            model_name,
-            model_provider,
+        self.chain = setup_chain(
+            self.model,
             prompt=code_query_prompt,
             additional_keys={
                 "paper_text": lambda x: x["paper_text"],
@@ -162,8 +187,18 @@ class CodeQueryChatbot(BaseChatbot):
         # Retrieve relevant reference information
         relevant_docs = self.retriever.invoke(user_input)
         relevant_code = "\n".join(
-            [f"From {doc.metadata['file_path']}:\n{doc.page_content}" for doc in relevant_docs]
+            [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get("filename", "N/A")}
+                Page Content: {contents}...
+            """
+            )
 
         return super().stream_response(
             user_input, {"paper_text": self.paper_text, "relevant_code": relevant_code}
@@ -179,33 +214,71 @@ class HybridQueryChatbot(BaseChatbot):
         model_provider: str,
         paper_path: str,
         references_dir: str,
-        code_dir: str,
+        github_repo_url: str = "https://github.com/prescient-design/StrainRelief.git",
+        split_method: str = "recursive",
+        embedding_method: str = "openai",
+        retriever_method: str = "base",
+        **kwargs,
     ):
         super().__init__(model_name, model_provider)
-        self.chain = get_chain(
-            model_name,
-            model_provider,
-            prompt=paper_query_plus_prompt,
-            additional_keys={
-                "paper_text": lambda x: x["paper_text"],
-                "references": lambda x: x["references"],
-                "code_dir": lambda x: x["code_dir"],
-            },
-        )
+
+        # Load the main paper
         self.paper_text = pypdf_loader(paper_path)
 
-        self.references = []
-        for file in os.listdir(references_dir):
-            self.references.append(pypdf_loader(os.path.join(references_dir, file)))
+        if os.path.exists(PERSIST_DIRECTORY):
+            logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
+            self.vectorstore = setup_vectorstore(
+                embedding_method=embedding_method, **kwargs.get("embedding_kwargs", {})
+            )
+        else:
+            logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
+            # Process references for embeddings and create vectorstore
+            self.code = code_loader(github_repo_url)
+            self.references = references_loader(references_dir)
+            split_docs = split_documents(
+                self.references, method=split_method, **kwargs.get("split_kwargs", {})
+            )
+            self.vectorstore = create_vectorstore(
+                self.code + split_docs,
+                embedding_method=embedding_method,
+                **kwargs.get("embedding_kwargs", {}),
+            )
 
-        self.code_dir = ""
+        self.retriever = setup_retriever(
+            self.vectorstore, method=retriever_method, **kwargs.get("retriever_kwargs", {})
+        )
+
+        # Update the chain
+        self.chain = setup_chain(
+            self.model,
+            prompt=hybrid_query_prompt,
+            additional_keys={
+                "paper_text": lambda x: x["paper_text"],
+                "relevant_references": lambda x: x["relevant_references"],
+            },
+        )
 
     def stream_response(self, user_input: str) -> Generator[str, None, None]:
+        # Retrieve relevant reference information
+        relevant_docs = self.retriever.invoke(user_input)
+        relevant_references = "\n".join(
+            [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
+        )
+
+        # Log the context documents
+        logger.debug(f"Context: {len(relevant_docs)} documents returned.")
+        for i, doc in enumerate(relevant_docs, start=1):
+            contents = doc.page_content[:200].replace("\n", " ")
+            logger.debug(
+                f"""Context Document {i}:\nDocument Title: {doc.metadata.get(RAG_DOC_ID, "N/A")}
+                Page Content: {contents}...
+            """
+            )
+
         return super().stream_response(
             user_input,
             {
                 "paper_text": self.paper_text,
-                "references": self.references,
-                "code_dir": self.code_dir,
+                "relevant_references": relevant_references,
             },
         )

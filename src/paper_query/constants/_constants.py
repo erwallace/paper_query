@@ -3,3 +3,5 @@ MODEL_PROVIDER_MAP = {
     "gpt-4o": "openai",
     "gpt-4o-mini": "openai",
 }
+
+RAG_DOC_ID = "file"
