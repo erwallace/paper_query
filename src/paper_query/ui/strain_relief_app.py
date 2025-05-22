@@ -1,11 +1,8 @@
-from pathlib import Path
-
 import streamlit as st
 
 from paper_query.chatbots import PaperQueryChatbot
+from paper_query.constants import assets_dir
 from paper_query.ui.components.chat_interface import display_chat_interface
-
-assets_dir = Path(__file__).resolve().parents[3] / "assets"
 
 
 def strain_relief_chatbot():
