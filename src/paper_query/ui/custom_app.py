@@ -20,7 +20,7 @@ def streamlit_chatbot():
     chatbot_args = get_chatbot_params(selected_chatbot_class)
 
     if st.sidebar.button("Confirm Chatbot", key="confirm_chatbot_button"):
-        st.session_state.chatbot_confirmed = True
+        st.session_state.chatbot_ready = True
         st.session_state.chatbot = selected_chatbot_class(**chatbot_args)
         st.sidebar.success(f"{selected_label} is ready!")
         st.title(f"{selected_label} Chatbot")
