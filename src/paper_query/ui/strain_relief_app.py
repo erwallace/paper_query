@@ -64,9 +64,6 @@ def strain_relief_chatbot():
                     f"to access the more powerful {STREAMLIT_EXPENSIVE_MODEL} model."
                 )
 
-        else:
-            logger.warning(st.session_state.messages)
-
         display_chat_interface()
 
     with about_tab:
