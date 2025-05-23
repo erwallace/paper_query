@@ -30,7 +30,7 @@ def strain_relief_chatbot():
     """Chatbot for the StrainRelief paper."""
     initialize_session_state()
 
-    st.title("The StrainRelief Chatbot")
+    st.title("StrainReliefChat")
     chat_tab, about_tab = st.tabs(["Chat", "About"])
 
     st.sidebar.title("API Configuration")
