@@ -6,24 +6,33 @@ def display_chat_interface() -> None:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    message_container = st.container()
 
+    # Display all past messages in the message container
+    with message_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+    # Create the input at the bottom
     if "chatbot_ready" in st.session_state and st.session_state.chatbot_ready:
         if user_input := st.chat_input("What is your question?", key="user_input"):
-            st.chat_message("user").markdown(user_input)
+            # Add user message to UI
+            with message_container:
+                st.chat_message("user").markdown(user_input)
             st.session_state.messages.append({"role": "user", "content": user_input})
 
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
+            # Add assistant response to UI
+            with message_container:
+                with st.chat_message("assistant"):
+                    message_placeholder = st.empty()
+                    full_response = ""
 
-                for response_chunk in st.session_state.chatbot.stream_response(user_input):
-                    full_response += response_chunk
+                    for response_chunk in st.session_state.chatbot.stream_response(user_input):
+                        full_response += response_chunk
+                        message_placeholder.markdown(full_response)
+
                     message_placeholder.markdown(full_response)
-
-                message_placeholder.markdown(full_response)
 
             st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
