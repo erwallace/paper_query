@@ -1,1 +1,2 @@
+[[:space:]]vectorstore/**/* filter=lfs diff=lfs merge=lfs -text
 vectorstore/*.sqlite3 filter=lfs diff=lfs merge=lfs -text
