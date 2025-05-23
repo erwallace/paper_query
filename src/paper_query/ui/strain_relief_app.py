@@ -7,7 +7,6 @@ from loguru import logger
 from paper_query.chatbots import HybridQueryChatbot
 from paper_query.constants import assets_dir
 from paper_query.ui.components.chat_interface import display_chat_interface
-from paper_query.ui.components.sidebar_api import setup_sidebar
 
 # Configure logger to use DEBUG level
 logger.remove()
@@ -22,6 +21,7 @@ def strain_relief_chatbot():
     st.session_state.chatbot_ready = True
 
     st.title("The StrainRelief Chatbot")
+    chat_tab, about_tab = st.tabs(["Chat", "About"])
 
     st.sidebar.title("API Configuration")
     # Enter API key in sidebar
@@ -59,13 +59,6 @@ def strain_relief_chatbot():
     # Display current model
     st.sidebar.markdown(f"Using {st.session_state.model_name} model.")
 
-    # Show info message only when using nano model
-    if st.session_state.model_name == CHEAP_MODEL:
-        st.info(
-            f"You are currently using {CHEAP_MODEL}. Add a valid OpenAI API key to access the more "
-            f"powerful {EXPENSIVE_MODEL} model."
-        )
-
     if "chatbot" not in st.session_state:
         st.session_state.chatbot = HybridQueryChatbot(
             model_name=st.session_state.model_name.lower(),
@@ -74,74 +67,32 @@ def strain_relief_chatbot():
             references_dir=str(assets_dir / "references"),
         )
 
-    if "messages" not in st.session_state:
-        st.markdown(
-            ":gray[**Abstract**: Ligand strain energy, the energy difference between the bound and "
-            "unbound conformations of a ligand, is an important component of structure-based small "
-            "molecule drug design. A large majority of observed ligands in protein-small molecule "
-            "co-crystal structures bind in low-strain conformations, making strain energy a useful "
-            "filter for structure-based drug design. In this work we present a tool for "
-            "calculating ligand strain with a high accuracy. StrainRelief uses a MACE Neural "
-            "Network Potential (NNP), trained on a large database of Density Functional Theory "
-            "(DFT) calculations to estimate ligand strain of neutral molecules with quantum "
-            "accuracy. We show that this tool estimates strain energy differences relative to DFT "
-            "to within 1.4 kcal/mol, more accurately than alternative NNPs. These results "
-            "highlight the utility of NNPs in drug discovery, and provide a useful tool for drug "
-            "discovery teams.]"
-        )
-
-    display_chat_interface()
-
-
-def strain_relief_chatbot_():
-    """Chatbot for the StrainRelief paper."""
-    if "chatbot_ready" not in st.session_state:
-        st.session_state.chatbot_ready = False
-
-    # Setup sidebar and get validated API key
-    openai_api_key = setup_sidebar()
-    if openai_api_key:
-        st.session_state.chatbot_ready = True
-
-    st.title("The StrainRelief Chatbot")
-
-    chat_tab, about_tab = st.tabs(["Chat", "About"])
-
     with chat_tab:
         if "messages" not in st.session_state:
             st.markdown(
-                ":gray[**Abstract**: Ligand strain energy, the energy difference between the bound "
-                "and unbound conformations of a ligand, is an important component of structure-"
-                "based small molecule drug design. A large majority of observed ligands in protein-"
-                "small molecule co-crystal structures bind in low-strain conformations, making "
-                "strain energy a useful filter for structure-based drug design. In this work we "
-                "present a tool for calculating ligand strain with a high accuracy. StrainRelief "
-                "uses a MACE Neural Network Potential (NNP), trained on a large database of "
-                "Density Functional Theory (DFT) calculations to estimate ligand strain of "
-                "neutral molecules with quantum accuracy. We show that this tool estimates "
-                "strain energy differences relative to DFT to within 1.4 kcal/mol, more "
-                "accurately than alternative NNPs. These results highlight the utility of NNPs "
-                "in drug discovery, and provide a useful tool for drug discovery teams.]"
+                ":gray[**Abstract**: Ligand strain energy, the energy difference between the "
+                "bound and unbound conformations of a ligand, is an important component of "
+                "structure-based small molecule drug design. A large majority of observed "
+                "ligands in protein-small molecule co-crystal structures bind in low-strain "
+                "conformations, making strain energy a useful filter for structure-based drug "
+                "design. In this work we present a tool for calculating ligand strain with a "
+                "high accuracy. StrainRelief uses a MACE Neural Network Potential (NNP), "
+                "trained on a large database of Density Functional Theory (DFT) calculations "
+                "to estimate ligand strain of neutral molecules with quantum accuracy. We show "
+                "that this tool estimates strain energy differences relative to DFT to within "
+                "1.4 kcal/mol, more accurately than alternative NNPs. These results highlight "
+                "the utility of NNPs in drug discovery, and provide a useful tool for drug "
+                "discovery teams.]"
             )
 
-        if st.session_state.chatbot_ready:
-            # Only initialize the chatbot if API key is provided
-            if "chatbot" not in st.session_state:
-                # Import here to avoid circular imports
-                from paper_query import constants
-
-                constants.OPENAI_API_KEY = openai_api_key
-
-                st.session_state.chatbot = HybridQueryChatbot(
-                    model_name="gpt-4o",
-                    model_provider="openai",
-                    paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
-                    references_dir=str(assets_dir / "references"),
+            # Show info message only when using nano model
+            if st.session_state.model_name == CHEAP_MODEL:
+                st.info(
+                    f"You are currently using {CHEAP_MODEL}. Add a valid OpenAI API key to access "
+                    f"the more powerful {EXPENSIVE_MODEL} model."
                 )
 
-            display_chat_interface()
-        else:
-            st.info("Please enter your OpenAI API key in the sidebar to start chatting.")
+        display_chat_interface()
 
     with about_tab:
         st.markdown(
