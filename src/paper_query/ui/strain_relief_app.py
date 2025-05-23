@@ -1,6 +1,7 @@
 import sys
 
 import streamlit as st
+from langchain_openai import ChatOpenAI
 from loguru import logger
 
 from paper_query.chatbots import HybridQueryChatbot
@@ -12,8 +13,87 @@ from paper_query.ui.components.sidebar_api import setup_sidebar
 logger.remove()
 logger.add(sys.stderr, level="DEBUG")
 
+CHEAP_MODEL = "GPT-4.1-nano"
+EXPENSIVE_MODEL = "GPT-4.1"
+
 
 def strain_relief_chatbot():
+    """Chatbot for the StrainRelief paper."""
+    st.session_state.chatbot_ready = True
+
+    st.title("The StrainRelief Chatbot")
+
+    st.sidebar.title("API Configuration")
+    # Enter API key in sidebar
+    openai_api_key = st.sidebar.text_input(
+        "OpenAI API Key",
+        type="password",
+        help="If you don't have an API key, you can get one from [OpenAI](https://platform.openai.com/api-keys).",
+        key="api_input",
+    )
+
+    # Initialize model_name in session state if not present
+    if "model_name" not in st.session_state:
+        st.session_state.model_name = CHEAP_MODEL
+
+    # Initialize last_validated_key to track key changes
+    if "last_validated_key" not in st.session_state:
+        st.session_state.last_validated_key = ""
+
+    # Only validate when key changes or is newly entered
+    if openai_api_key and openai_api_key != st.session_state.last_validated_key:
+        try:
+            chat = ChatOpenAI(openai_api_key=openai_api_key, model=CHEAP_MODEL.lower())
+            chat.invoke("Hello")
+            logger.debug("API key validation successful.")
+            st.session_state.model_name = EXPENSIVE_MODEL
+            st.session_state.last_validated_key = openai_api_key
+        except Exception as e:
+            logger.error(f"API key validation failed: {e}")
+            st.sidebar.error("Invalid API key. Please check your OpenAI API key.")
+            st.session_state.model_name = CHEAP_MODEL
+    elif not openai_api_key:
+        # Reset to nano model if key is cleared
+        st.session_state.model_name = CHEAP_MODEL
+
+    # Display current model
+    st.sidebar.markdown(f"Using {st.session_state.model_name} model.")
+
+    # Show info message only when using nano model
+    if st.session_state.model_name == CHEAP_MODEL:
+        st.info(
+            f"You are currently using {CHEAP_MODEL}. Add a valid OpenAI API key to access the more "
+            f"powerful {EXPENSIVE_MODEL} model."
+        )
+
+    if "chatbot" not in st.session_state:
+        st.session_state.chatbot = HybridQueryChatbot(
+            model_name=st.session_state.model_name.lower(),
+            model_provider="openai",
+            paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
+            references_dir=str(assets_dir / "references"),
+        )
+
+    if "messages" not in st.session_state:
+        st.markdown(
+            ":gray[**Abstract**: Ligand strain energy, the energy difference between the bound and "
+            "unbound conformations of a ligand, is an important component of structure-based small "
+            "molecule drug design. A large majority of observed ligands in protein-small molecule "
+            "co-crystal structures bind in low-strain conformations, making strain energy a useful "
+            "filter for structure-based drug design. In this work we present a tool for "
+            "calculating ligand strain with a high accuracy. StrainRelief uses a MACE Neural "
+            "Network Potential (NNP), trained on a large database of Density Functional Theory "
+            "(DFT) calculations to estimate ligand strain of neutral molecules with quantum "
+            "accuracy. We show that this tool estimates strain energy differences relative to DFT "
+            "to within 1.4 kcal/mol, more accurately than alternative NNPs. These results "
+            "highlight the utility of NNPs in drug discovery, and provide a useful tool for drug "
+            "discovery teams.]"
+        )
+
+    display_chat_interface()
+
+
+def strain_relief_chatbot_():
     """Chatbot for the StrainRelief paper."""
     if "chatbot_ready" not in st.session_state:
         st.session_state.chatbot_ready = False
