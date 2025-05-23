@@ -8,23 +8,13 @@ from langchain_core.documents import Document
 from langchain_core.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import OpenAIEmbeddings
-from paper_query import constants
-from paper_query.constants import project_dir, test_dir
+from paper_query.constants import test_dir
 
 if sys.platform != "linux":  # Skip for GitHub actions
     from paper_query.constants import GROQ_API_KEY, OPENAI_API_KEY
 
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     os.environ["GROQ_API_KEY"] = GROQ_API_KEY
-
-
-@pytest.fixture(autouse=True)
-def override_persist_directory():
-    """Override PERSIST_DIRECTORY for tests - needed for GitLab CI.
-
-    To be used PERSIST_DIRECTORY must be imported WITHIN the test function."""
-    constants.PERSIST_DIRECTORY = str(project_dir / "test" / "assets" / "vectorstore")
-    yield
 
 
 @pytest.fixture
