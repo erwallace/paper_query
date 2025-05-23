@@ -28,20 +28,20 @@ pre-commit install
 ```
 
 ## API Keys
-API keys are stored in ~/.config/my_api_keys. Youo will need to create and populate this yourself to run the app. Example format:
+API keys are stored in ~/.config/my_api_keys. You will need to create and populate this yourself to run the app locally. Example format:
 ```
 TEMPLATE_API_KEY=some_key
 ```
 
 # Usage
 
-Both StrainReliefChat™️ and PaperQuery are available through the command line or a streamlit app.
+Both StrainReliefChat and PaperQuery are available through the command line or a streamlit app.
 
 ## Streamlit App
 
-- StrainReliefChat: locally at `src/paper_query/ui/strain_relief_app.py`, deployed [here](https://strain-relief.streamlit.app/).
+- **StrainReliefChat**: locally at `src/paper_query/ui/strain_relief_app.py`, deployed [here](https://strain-relief.streamlit.app/).
 
-- PaperQuery: locally at `src/paper_query/ui/custom_app.py`, deployment coming soon.
+- **PaperQuery**: locally at `src/paper_query/ui/custom_app.py`, deployment coming soon.
 
 ```
 streamlit run path/to/app.py
