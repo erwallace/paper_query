@@ -13,8 +13,8 @@ from paper_query.ui.components.sidebar_inputs import (
 
 
 def test_model_name_input():
-    assert model_name_input() == "gpt-4o"
-    assert model_name_input("gpt-4o-mini") == "gpt-4o-mini"
+    assert model_name_input() == "gpt-4.1"
+    assert model_name_input("gpt-4.1-nano") == "gpt-4.1-nano"
 
 
 def test_model_provider_input():
@@ -38,7 +38,7 @@ def test_code_dir_input():
 
 
 def test_get_param():
-    assert get_param("model_name") == "gpt-4o"
+    assert get_param("model_name") == "gpt-4.1"
     assert get_param("model_provider") == "openai"
     assert get_param("paper_path") == str(assets_dir / "strainrelief_preprint.pdf")
     assert get_param("references_dir") == str(assets_dir / "references")
@@ -48,4 +48,4 @@ def test_get_param():
 
 
 def test_get_chatbot_params():
-    assert get_chatbot_params(BaseChatbot) == {"model_name": "gpt-4o", "model_provider": "openai"}
+    assert get_chatbot_params(BaseChatbot) == {"model_name": "gpt-4.1", "model_provider": "openai"}

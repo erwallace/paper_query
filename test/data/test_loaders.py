@@ -22,7 +22,7 @@ def test_pypdf_loader_w_images(test_assets_dir):
     """Test the pypdf_loader_w_images function."""
     path = test_assets_dir / "example_pdf.pdf"
     # TODO: change to free model
-    doc = pypdf_loader_w_images(path, "gpt-4o-mini", "openai")
+    doc = pypdf_loader_w_images(path, "gpt-4.1-nano", "openai")
     assert isinstance(doc, Document)
 
 
