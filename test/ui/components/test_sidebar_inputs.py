@@ -38,7 +38,7 @@ def test_code_dir_input():
 
 
 def test_get_param():
-    assert get_param("model_name") == "gpt-4.1-nano"
+    assert get_param("model_name") == "gpt-4.1"
     assert get_param("model_provider") == "openai"
     assert get_param("paper_path") == str(assets_dir / "strainrelief_preprint.pdf")
     assert get_param("references_dir") == str(assets_dir / "references")
