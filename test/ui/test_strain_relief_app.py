@@ -1,10 +1,13 @@
 import pytest
-from paper_query.constants import src_dir
+from paper_query.constants import (
+    OPENAI_API_KEY,
+    STREAMLIT_CHEAP_MODEL,
+    STREAMLIT_EXPENSIVE_MODEL,
+    src_dir,
+)
 from streamlit.testing.v1 import AppTest
 
-# TODO: max context of 6,000 tokens. Most chatbots require more to hold the paper in context.
-MODEL_NAME = "llama-3.1-8b-instant"
-MODEL_PROVIDER = "groq"
+TIMEOUT = 20
 
 
 @pytest.fixture
@@ -22,7 +25,27 @@ def test_streamlit_chatbot(app):
 
 
 @pytest.mark.app
-def test_chatbot_interaction(app):
+def test_chatbot_interaction_default_model(app):
     """Tests interacting with the chatbot."""
-    app.chat_input("user_input").set_value("hello").run(timeout=10)
+    app.chat_input("user_input").set_value("hello").run(timeout=TIMEOUT)
+    assert not app.exception
+
+
+@pytest.mark.app
+def test_chatbot_interaction_expensive_model(app):
+    """Tests interacting with the chatbot."""
+    assert app.session_state.model_name == STREAMLIT_CHEAP_MODEL
+    app.sidebar.text_input("api_input").set_value(OPENAI_API_KEY).run()
+    assert app.session_state.model_name == STREAMLIT_EXPENSIVE_MODEL
+    app.chat_input("user_input").set_value("hello").run(timeout=TIMEOUT)
+    assert not app.exception
+
+
+@pytest.mark.app
+def test_invalid_api_key(app):
+    """Tests interacting with the chatbot."""
+    assert app.session_state.model_name == STREAMLIT_CHEAP_MODEL
+    app.sidebar.text_input("api_input").set_value("invlaid key").run()
+    assert app.session_state.model_name == STREAMLIT_CHEAP_MODEL
+    app.chat_input("user_input").set_value("hello").run(timeout=TIMEOUT)
     assert not app.exception
