@@ -126,7 +126,7 @@ def strain_relief_chatbot():
         - Uses the LLM to generate a response based on all available information
 
         The chatbot uses the following components:
-        - **LLM**: GPT-4o from OpenAI for generating responses
+        - **LLM**: GPT-4.1 from OpenAI for generating responses
         - **Embedding**: OpenAI embeddings for vector search
         - **Vector Database**: ChromaDB for storing and retrieving embedded documents
 
