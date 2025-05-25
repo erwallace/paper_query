@@ -5,7 +5,6 @@ from langchain_core.documents.base import Document
 from paper_query.data.loaders import (
     code_loader,
     pypdf_loader,
-    pypdf_loader_w_images,
     references_loader,
 )
 
@@ -13,7 +12,7 @@ from paper_query.data.loaders import (
 def test_pypdf_loader(test_assets_dir):
     """Test the pypdf_loader function."""
     path = test_assets_dir / "example_pdf.pdf"
-    doc = pypdf_loader(path)
+    doc = pypdf_loader(path, interpret_images=False)
     assert isinstance(doc, Document)
 
 
@@ -22,7 +21,7 @@ def test_pypdf_loader_w_images(test_assets_dir):
     """Test the pypdf_loader_w_images function."""
     path = test_assets_dir / "example_pdf.pdf"
     # TODO: change to free model
-    doc = pypdf_loader_w_images(path, "gpt-4.1-nano", "openai")
+    doc = pypdf_loader(path, interpret_images=True, model="gpt-4.1-nano", provider="openai")
     assert isinstance(doc, Document)
 
 
