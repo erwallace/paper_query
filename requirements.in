@@ -9,3 +9,4 @@ chromadb
 sentence-transformers
 accelerate
 loguru
+ragchecker
