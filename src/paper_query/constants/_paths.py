@@ -8,3 +8,4 @@ data_dir: Path = project_dir / "data"
 assets_dir: Path = project_dir / "assets"
 
 PERSIST_DIRECTORY: str = str(project_dir / "vectorstore")
+METRICS_JSON: str = str(project_dir / "evaluation" / "rag_evaluation_results.json")
