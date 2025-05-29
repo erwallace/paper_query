@@ -1,0 +1,14 @@
+{
+    "results": [
+       {
+          "query_id": "000",
+          "query": "This is the question for the first example",
+          "gt_answer": "This is the ground truth answer for the first example"
+       },
+       {
+          "query_id": "001",
+          "query": "This is the question for the second example",
+          "gt_answer": "This is the ground truth answer for the second example"
+       }
+    ]
+ }

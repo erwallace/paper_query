@@ -31,7 +31,9 @@ class BaseChatbot:
         self.model = setup_model(model_name, model_provider)
         self.chain = setup_chain(self.model, prompt=base_prompt)
 
-    def stream_response(self, user_input: str, chain_args: dict = {}) -> Generator[str, None, None]:
+    def stream_response(
+        self, user_input: str, chain_args: dict = {}, metadata: dict | None = None
+    ) -> Generator[str, None, None]:
         """Process user input and stream AI response."""
         # Add user message to history before streaming
         logger.debug(f'User input:\n"{user_input}"')
@@ -45,7 +47,11 @@ class BaseChatbot:
             yield chunk
 
         # After streaming is complete, add the full response to chat history
-        self.chat_history.append(AIMessage(content=full_response))
+        self.chat_history.append(
+            AIMessage(
+                content=full_response, response_metadata={"context": metadata} if metadata else {}
+            )
+        )
         logger.debug(f'AI response:\n"{full_response}"')
 
 
@@ -121,6 +127,13 @@ class PaperQueryPlusChatbot(BaseChatbot):
         relevant_references = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+        relevant_metadata = [
+            {
+                "Document Title": doc.metadata.get(RAG_DOC_ID, "N/A"),
+                "Content": doc.page_content,
+            }
+            for doc in relevant_docs
+        ]
 
         # Log the context documents
         logger.debug(f"Context: {len(relevant_docs)} documents returned.")
@@ -133,7 +146,9 @@ class PaperQueryPlusChatbot(BaseChatbot):
             )
 
         return super().stream_response(
-            user_input, {"paper_text": self.paper_text, "relevant_references": relevant_references}
+            user_input,
+            {"paper_text": self.paper_text, "relevant_references": relevant_references},
+            relevant_metadata,
         )
 
 
@@ -189,6 +204,13 @@ class CodeQueryChatbot(BaseChatbot):
         relevant_code = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+        relevant_metadata = [
+            {
+                "Document Title": doc.metadata.get(RAG_DOC_ID, "N/A"),
+                "Content": doc.page_content,
+            }
+            for doc in relevant_docs
+        ]
 
         # Log the context documents
         logger.debug(f"Context: {len(relevant_docs)} documents returned.")
@@ -201,7 +223,9 @@ class CodeQueryChatbot(BaseChatbot):
             )
 
         return super().stream_response(
-            user_input, {"paper_text": self.paper_text, "relevant_code": relevant_code}
+            user_input,
+            {"paper_text": self.paper_text, "relevant_code": relevant_code},
+            relevant_metadata,
         )
 
 
@@ -264,14 +288,22 @@ class HybridQueryChatbot(BaseChatbot):
         relevant_references = "\n".join(
             [f"From {doc.metadata[RAG_DOC_ID]}:\n{doc.page_content}" for doc in relevant_docs]
         )
+        relevant_metadata = [
+            {
+                "Document Title": doc.metadata.get(RAG_DOC_ID, "N/A"),
+                "Content": doc.page_content,
+            }
+            for doc in relevant_docs
+        ]
 
         # Log the context documents
         logger.debug(f"Context: {len(relevant_docs)} documents returned.")
-        for i, doc in enumerate(relevant_docs, start=1):
-            contents = doc.page_content[:200].replace("\n", " ")
+        for i, doc in enumerate(relevant_metadata, start=1):
+            contents = doc["Content"][:200].replace("\n", " ")
             logger.debug(
-                f"""Context Document {i}:\nDocument Title: {doc.metadata.get(RAG_DOC_ID, "N/A")}
-                Page Content: {contents}...
+                f"""Context Document {i}:
+                Document Title: {doc["Document Title"]}
+                Page Content: {contents}
             """
             )
 
@@ -281,4 +313,5 @@ class HybridQueryChatbot(BaseChatbot):
                 "paper_text": self.paper_text,
                 "relevant_references": relevant_references,
             },
+            relevant_metadata,
         )

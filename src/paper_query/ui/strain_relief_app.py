@@ -30,7 +30,7 @@ def strain_relief_chatbot():
     """Chatbot for the StrainRelief paper."""
     initialize_session_state()
 
-    st.title("The StrainRelief Chatbot")
+    st.title("StrainReliefChat")
     chat_tab, about_tab = st.tabs(["Chat", "About"])
 
     st.sidebar.title("API Configuration")
@@ -46,12 +46,14 @@ def strain_relief_chatbot():
     # Display current model
     st.sidebar.markdown(f"Using **{st.session_state.model_name}** model.")
 
-    st.session_state.chatbot = HybridQueryChatbot(
-        model_name=st.session_state.model_name.lower(),
-        model_provider="openai",
-        paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
-        references_dir=str(assets_dir / "references"),
-    )
+    # Only instantiate chatbot once and store in session state
+    if st.session_state.chatbot is None:
+        st.session_state.chatbot = HybridQueryChatbot(
+            model_name=st.session_state.model_name.lower(),
+            model_provider="openai",
+            paper_path=str(assets_dir / "strainrelief_preprint.pdf"),
+            references_dir=str(assets_dir / "references"),
+        )
 
     with chat_tab:
         if "messages" not in st.session_state:

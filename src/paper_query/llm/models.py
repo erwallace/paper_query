@@ -1,10 +1,11 @@
 import os
 
 from langchain.chat_models import init_chat_model
+from langchain_core.language_models.chat_models import BaseChatModel
 from loguru import logger
 
 
-def setup_model(model_name: str, model_provider: str, **kwargs):
+def setup_model(model_name: str, model_provider: str, **kwargs) -> BaseChatModel:
     """Initialize the chat model."""
     logger.info(f"Initializing {model_name} model from {model_provider}")
     if model_provider == "openai":

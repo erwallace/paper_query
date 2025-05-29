@@ -10,13 +10,24 @@ from paper_query.constants import RAG_DOC_ID, assets_dir
 from paper_query.llm import setup_model
 
 
-def pypdf_loader(file_path: str) -> Document:
+def pypdf_loader(file_path: str, interpret_images: bool = False, **image_kwargs) -> Document:
+    """Function to load a PDF file, optionally interpreting images."""
+    if interpret_images and "model" not in image_kwargs:
+        raise ValueError("When interpret_images is True, 'model' must be provided in image_kwargs.")
+
+    if interpret_images:
+        return _pypdf_loader_w_images(file_path, **image_kwargs)
+    else:
+        return _pypdf_loader(file_path)
+
+
+def _pypdf_loader(file_path: str) -> Document:
     """Function to load text from a PDF file."""
     logger.debug("Loading PDF file using PyPDFLoader")
     return PyPDFLoader(file_path, mode="single").load()[0]
 
 
-def pypdf_loader_w_images(
+def _pypdf_loader_w_images(
     file_path: str, model: str, provider: str, max_tokens: int = 1024
 ) -> Document:
     """Function to load text from a PDF file with images."""
