@@ -49,7 +49,7 @@ class BaseChatbot:
         # After streaming is complete, add the full response to chat history
         self.chat_history.append(
             AIMessage(
-                content=full_response, response_metadata={"context": metadata} if metadata else None
+                content=full_response, response_metadata={"context": metadata} if metadata else {}
             )
         )
         logger.debug(f'AI response:\n"{full_response}"')
