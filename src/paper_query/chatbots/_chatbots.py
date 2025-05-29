@@ -223,7 +223,9 @@ class HybridQueryChatbot(BaseChatbot):
         super().__init__(model_name, model_provider)
 
         # Load the main paper
-        self.paper_text = pypdf_loader(paper_path)
+        self.paper_text = pypdf_loader(
+            paper_path, interpret_images=True, model="gpt-4o", provider="openai"
+        )
 
         if os.path.exists(PERSIST_DIRECTORY):
             logger.info(f"Loading vectorstore from {PERSIST_DIRECTORY}...")
@@ -234,7 +236,7 @@ class HybridQueryChatbot(BaseChatbot):
             logger.info(f"Creating new vectorstore at {PERSIST_DIRECTORY}...")
             # Process references for embeddings and create vectorstore
             self.code = code_loader(github_repo_url)
-            self.references = references_loader(references_dir)
+            self.references = references_loader(references_dir, interpret_images=False)
             split_docs = split_documents(
                 self.references, method=split_method, **kwargs.get("split_kwargs", {})
             )
